@@ -1,9 +1,4 @@
 import {
-  Background,
-  Container,
-  StartTitle,
-  MiddleTitle,
-  EndTitle,
   AuthText,
   CustomForm,
   CustomInput,
@@ -14,54 +9,54 @@ import {
   CustomLoginArrow,
   CustomSignUpArrow,
 } from "../components/LoginComponents";
-
+import { Background, Container } from "../components/GlobalComponents";
+import Title from "../components/Title";
 import arrow from "../assets/icons/arrow.svg";
-
 import React, { useState, useEffect } from "react";
-
 import { useDispatch } from "react-redux";
-
-import { authActions } from "../store";
-
-import axios from "axios";
-
+import { sendLoginRequest, userActions } from "../store/user-slice";
+import { useAppSelector } from "../hooks/custom-useSelector";
+import { useNavigate } from "react-router-dom";
 const Login: React.FC = () => {
-  const [Email, setEmail] = useState<string>("");
-  const [Password, setPassword] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const dispatch = useDispatch();
+  const user = useAppSelector((state) => state.user);
+  const token = useAppSelector((state) => state.user.token);
+  const navigate = useNavigate();
 
-  /* const [login, setlogin] = useState();
   useEffect(() => {
-    axios.post('http://127.0.0.1:3333/login', {
-      email: 'user@teste.com',
-      password: 'secret'
-    }).then((res) => {
-      console.log(res);
-    })
-  }, []) */
+    if(token.expires_at != "") {
+      const expireAt = new Date(token.expires_at).getTime();
+      console.log(expireAt - new Date().getTime());
+      var isExpired =  expireAt - new Date().getTime() <= 0;
+      console.log(isExpired);
+      if(isExpired) {
+        dispatch(userActions.logout());
+      } else {
+        navigate('/');
+      }
+    }
+  }, [token])
 
   const loginHandler = (event: React.FormEvent) => {
     event.preventDefault();
-    dispatch(authActions.login({
-      email: Email,
-      password: Password
-    }));
+
+    dispatch(sendLoginRequest(email, password));
   };
+
+  const registrationRedirect = () => {
+    navigate('/registration');
+  }
 
   return (
     <Background>
-      <Container>
-        <StartTitle>The</StartTitle>
-        <StartTitle>Greatest</StartTitle>
-        <StartTitle>App</StartTitle>
-        <MiddleTitle>for</MiddleTitle>
-        <EndTitle>LOTTERY</EndTitle>
-      </Container>
+      <Title />
       <Container>
         <AuthText>Authentication</AuthText>
         <CustomForm onSubmit={loginHandler}>
           <CustomInput
-            value={Email}
+            value={email}
             onChange={(e) => setEmail(e.target.value)}
             type="email"
             placeholder="Email"
@@ -69,7 +64,7 @@ const Login: React.FC = () => {
           />
           <CustomHr />
           <CustomInput
-            value={Password}
+            value={password}
             onChange={(e) => setPassword(e.target.value)}
             type="password"
             placeholder="Password"
@@ -81,7 +76,7 @@ const Login: React.FC = () => {
             Log In <CustomLoginArrow src={arrow} />
           </CustomLoginButton>
         </CustomForm>
-        <CustomSignUpButton>
+        <CustomSignUpButton onClick={registrationRedirect}>
           Sign Up <CustomSignUpArrow src={arrow} />
         </CustomSignUpButton>
       </Container>

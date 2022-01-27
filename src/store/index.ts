@@ -1,29 +1,15 @@
-import { createSlice, configureStore } from "@reduxjs/toolkit";
-
-const initialLoginState = { email: "", password: "" };
-
-const authSlice = createSlice({
-  name: "auth",
-  initialState: initialLoginState,
-  reducers: {
-    login(state, action) {
-      state.email = action.payload.email;
-      state.password = action.payload.password;
-    },
-    logout(state) {
-      state.email = "";
-      state.password = "";
-    },
-  },
-});
-
+import { configureStore } from "@reduxjs/toolkit";
+import { notificationSlice } from "./notification-slice";
+import { userSlice } from "./user-slice";
 
 const store = configureStore({
   reducer: {
-    auth: authSlice.reducer,
+    user: userSlice.reducer,
+    notification: notificationSlice.reducer,
   },
 });
 
-export const authActions = authSlice.actions;
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
 
 export default store;
