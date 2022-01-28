@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 
 export const Background = styled.section`
   display: flex;
@@ -51,4 +52,62 @@ export const EndTitle = styled.h1`
   text-align: center;
   margin: 0;
   font-style: italic;
+`;
+
+export const NavBar = styled.section`
+  display: flex;
+  justify-content: space-between;
+  align-content: space-between;
+  padding-left: 130px;
+  padding-right: 200px;
+`;
+
+export const LogoContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const Logo = styled.h1`
+  font-size: 44px;
+  font-weight: bold;
+  font-style: italic;
+  color: #707070;
+  margin: 0;
+`;
+
+export const LogoUnderline = styled.div`
+  height: 7px;
+  background-color: #B5C401;
+  border-radius: 6px;
+  width: 100%;
+`;
+
+export const NavBarLinks = styled.div`
+  display: flex;
+  justify-content: space-around;
+`;
+
+export const NavLink = styled(Link)`
+  font-size: 20px;
+  font-weight: bold;
+  font-style: italic;
+  color: #707070;
+  margin-left: 28.5px;
+  margin-right: 28.5px;
+  line-height: 70px;
+  text-decoration: none;
+  :visited & :active {
+    color: #707070;
+  }
+  :hover {
+    color: #626262;
+  }
+`;
+
+export const NavHr = styled.hr`
+  border: 1px solid #EBEBEB;
+  /* width: 100%; */
+  height: 0;
+  margin: 0;
+  margin-top: -9px;
 `;

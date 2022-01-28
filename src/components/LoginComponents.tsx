@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 
 export const AuthText = styled.h2`
   color: #707070;
@@ -39,7 +40,7 @@ export const CustomHr = styled.hr`
   border: 1px solid #ebebeb;
 `;
 
-export const ForgetPasswordLink = styled.a`
+export const ForgetPasswordLink = styled(Link)`
   font-size: 17px;
   font-style: italic;
   color: #c1c1c1;

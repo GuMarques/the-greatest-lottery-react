@@ -26,18 +26,18 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if(token.expires_at != "") {
+    if (token.expires_at != "") {
       const expireAt = new Date(token.expires_at).getTime();
       console.log(expireAt - new Date().getTime());
-      var isExpired =  expireAt - new Date().getTime() <= 0;
+      var isExpired = expireAt - new Date().getTime() <= 0;
       console.log(isExpired);
-      if(isExpired) {
+      if (isExpired) {
         dispatch(userActions.logout());
       } else {
-        navigate('/');
+        navigate("/");
       }
     }
-  }, [token])
+  }, [token]);
 
   const loginHandler = (event: React.FormEvent) => {
     event.preventDefault();
@@ -46,8 +46,8 @@ const Login: React.FC = () => {
   };
 
   const registrationRedirect = () => {
-    navigate('/registration');
-  }
+    navigate("/registration");
+  };
 
   return (
     <Background>
@@ -71,7 +71,7 @@ const Login: React.FC = () => {
             required
           />
           <CustomHr />
-          <ForgetPasswordLink href="#">I forget my password</ForgetPasswordLink>
+          <ForgetPasswordLink to="/reset-password">I forget my password</ForgetPasswordLink>
           <CustomLoginButton>
             Log In <CustomLoginArrow src={arrow} />
           </CustomLoginButton>

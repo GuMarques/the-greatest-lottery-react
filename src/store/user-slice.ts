@@ -91,3 +91,21 @@ export const sendSignUpRequest = (
       });
   };
 };
+
+export const sendResetEmailRequest = (email: string) => {
+return (dispatch: React.Dispatch<any>) => {
+  axios.post("http://127.0.0.1:3333/reset", {
+    email
+  }).then((res) => {
+    dispatch(notificationActions.runNotification({
+      status: 'sucess',
+      message: 'An code has been sended to your email'
+    }))
+  }).catch((err) => {
+    dispatch(notificationActions.runNotification({
+      status: 'error',
+      message: err.message
+    }))
+  })
+}
+}
