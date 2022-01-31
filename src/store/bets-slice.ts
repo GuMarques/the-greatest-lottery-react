@@ -5,7 +5,7 @@ import React from "react";
 import Bet from "../models/bet";
 import { notificationActions } from "./notification-slice";
 
-const initialBetState = [new Bet(0, 0, 0, "", 0, "", 0, "")];
+const initialBetState: string[] = [];
 
 export const betSlice = createSlice({
   name: "bet",
@@ -22,7 +22,11 @@ export const betSlice = createSlice({
         action.payload.type_id,
         action.payload.type
       );
-      state.push(newBet);
+      const formatedBet = JSON.stringify(newBet);
+      state.push(formatedBet);
+    },
+    clearBets(_) {
+      return initialBetState;
     },
   },
 });
@@ -36,6 +40,7 @@ export const getBetsFromAPI = (token: string) => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
+        dispatch(betActions.clearBets());
         res.data.forEach((bet: Bet) => {
           dispatch(
             betActions.newBet({
@@ -50,11 +55,15 @@ export const getBetsFromAPI = (token: string) => {
             })
           );
         });
-      }).catch((err) => {
-        dispatch(notificationActions.runNotification({
-          status: 'error',
-          message: err.errors[0].message
-        }))
       })
+      .catch((err) => {
+        console.log(err);
+        dispatch(
+          notificationActions.runNotification({
+            status: "error",
+            message: err.errors[0].message,
+          })
+        );
+      });
   };
 };

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 export const Body = styled.div`
@@ -9,7 +10,7 @@ export const Container = styled.section`
   display: flex;
   flex-direction: column;
   padding-left: 130px;
-  padding-right: 200px;
+  padding-right: 166px;
   margin-top: 69px;
 `;
 
@@ -35,17 +36,41 @@ export const FiltersText = styled.p`
   margin-top: 4px;
 `;
 
-export const FilterButton = styled.button`
+export const FilterButton = styled.button<GameColorType>`
   border-radius: 100px;
-  border: 2px #7f3992 solid;
+  border: 2px solid ${(props: GameColorType) =>
+    props.bgColor !== undefined ? props.bgColor : "#7f3992"};;
   background-color: white;
   width: 113px;
   height: 34px;
   font-size: 14px;
   font-style: italic;
-  color: #7f3992;
+  color: ${(props: GameColorType) =>
+    props.bgColor !== undefined ? props.bgColor : "#7f3992"};
   margin-right: 25px;
   font-weight: bold;
+  :hover {
+    background-color: ${(props: GameColorType) =>
+    props.bgColor !== undefined ? props.bgColor : "#7f3992"};
+    color: white;
+  }
+  &.active {
+    background-color: ${(props: GameColorType) =>
+    props.bgColor !== undefined ? props.bgColor : "#7f3992"};
+    color: white;
+  }
+`;
+
+export const NewBetLink = styled(Link)`
+  font-size: 24px;
+  color: #B5C401;
+  font-weight: bold;
+  font-style: italic;
+  text-decoration: none;
+  margin-left: auto;
+  :hover {
+    color: #9dac02;
+  }
 `;
 
 export const GameContainer = styled.div`
@@ -59,12 +84,13 @@ export const InfosContainer = styled.div`
   flex-direction: column;
 `;
 
-export const GameBar = styled.div`
+export const GameBar = styled.div<GameColorType>`
   max-width: 4.73px;
   min-width: 4.73px;
   height: 86px;
   border-radius: 100px;
-  background-color: #7f3992;
+  background-color: ${(props: GameColorType) =>
+    props.bgColor !== undefined ? props.bgColor : "#7f3992"};
   margin-right: 12px;
 `;
 
@@ -83,10 +109,15 @@ export const GameInfos = styled.p`
   margin-top: 10px;
 `;
 
-export const GameName = styled.p`
-  color: #7f3992;
+export const GameName = styled.p<GameColorType>`
+  color: ${(props: GameColorType) =>
+    props.bgColor !== undefined ? props.bgColor : "#7f3992"};
   margin: 0;
   margin-right: 14px;
   font-style: italic;
   font-weight: bold;
 `;
+
+type GameColorType = {
+  bgColor?: string;
+};

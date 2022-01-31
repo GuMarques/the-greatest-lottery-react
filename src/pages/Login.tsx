@@ -18,26 +18,23 @@ import { sendLoginRequest, userActions } from "../store/user-slice";
 import { useAppSelector } from "../hooks/custom-useSelector";
 import { useNavigate } from "react-router-dom";
 const Login: React.FC = () => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [email, setEmail] = useState<string>("user@teste.com");
+  const [password, setPassword] = useState<string>("secret");
   const dispatch = useDispatch();
-  const user = useAppSelector((state) => state.user);
   const token = useAppSelector((state) => state.user.token);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (token.expires_at != "") {
+    if (token.expires_at !== "") {
       const expireAt = new Date(token.expires_at).getTime();
-      console.log(expireAt - new Date().getTime());
-      var isExpired = expireAt - new Date().getTime() <= 0;
-      console.log(isExpired);
+      const isExpired = expireAt - new Date().getTime() <= 0;
       if (isExpired) {
         dispatch(userActions.logout());
       } else {
         navigate("/");
       }
     }
-  }, [token]);
+  }, [token, dispatch, navigate]);
 
   const loginHandler = (event: React.FormEvent) => {
     event.preventDefault();
