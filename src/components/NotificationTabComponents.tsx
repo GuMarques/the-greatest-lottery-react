@@ -5,7 +5,7 @@ export const CustomNotificationTab = styled.div`
   height: 60px;
   background-color: aquamarine;
   color: white;
-  position: absolute;
+  position: fixed;
   /* top: -60px; */
   transition: all 0.3s ease-out;
   &.error {

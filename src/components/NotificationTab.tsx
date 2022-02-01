@@ -8,24 +8,32 @@ import {
 } from "./NotificationTabComponents";
 
 const NotificationTab = () => {
-  const notification = useAppSelector(state => state.notification);
+  const notification = useAppSelector((state) => state.notification);
   const dispatch = useDispatch();
+  let timeout: NodeJS.Timeout;
 
   useEffect(() => {
-    if(notification.active) {
-      setTimeout(() => {
+    if (notification.active) {
+      timeout = setTimeout(() => {
         dispatch(notificationActions.dismissNotification());
       }, 4000);
     }
-  }, [notification.active])
+  }, [notification.active]);
 
   const handlerNotification = () => {
+    if (timeout !== null) clearTimeout(timeout);
     dispatch(notificationActions.dismissNotification());
-  }
+  };
 
-  const cssClasses = [notification.status, notification.active ? 'open' : 'close']
+  const cssClasses = [
+    notification.status,
+    notification.active ? "open" : "close",
+  ];
   return (
-    <CustomNotificationTab className={cssClasses.join(' ')} onClick={handlerNotification}>
+    <CustomNotificationTab
+      className={cssClasses.join(" ")}
+      onClick={handlerNotification}
+    >
       <NotificationParagraph>{notification.message}</NotificationParagraph>
     </CustomNotificationTab>
   );

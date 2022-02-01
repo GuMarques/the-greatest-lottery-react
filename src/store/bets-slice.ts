@@ -2,8 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 
 import axios from "axios";
 import React from "react";
-import Bet from "../models/bet";
 import { notificationActions } from "./notification-slice";
+import Bet from "../interfaces/bet";
 
 const initialBetState: string[] = [];
 
@@ -12,16 +12,7 @@ export const betSlice = createSlice({
   initialState: initialBetState,
   reducers: {
     newBet(state, action) {
-      const newBet = new Bet(
-        action.payload.id,
-        action.payload.user_id,
-        action.payload.game_id,
-        action.payload.choosen_numbers,
-        action.payload.price,
-        action.payload.created_at,
-        action.payload.type_id,
-        action.payload.type
-      );
+      const newBet: Bet = action.payload;
       const formatedBet = JSON.stringify(newBet);
       state.push(formatedBet);
     },
@@ -42,18 +33,19 @@ export const getBetsFromAPI = (token: string) => {
       .then((res) => {
         dispatch(betActions.clearBets());
         res.data.forEach((bet: Bet) => {
-          dispatch(
-            betActions.newBet({
-              id: bet.id,
-              user_id: bet.user_id,
-              game_id: bet.game_id,
-              choosen_numbers: bet.choosen_numbers,
-              price: bet.price,
-              created_at: bet.created_at,
-              type_id: bet.type.id,
+          const newBet: Bet = {
+            id: bet.id,
+            user_id: bet.user_id,
+            game_id: bet.game_id,
+            choosen_numbers: bet.choosen_numbers,
+            price: bet.price,
+            created_at: bet.created_at,
+            type: {
+              id: bet.type.id,
               type: bet.type.type,
-            })
-          );
+            },
+          };
+          dispatch(betActions.newBet(newBet));
         });
       })
       .catch((err) => {

@@ -3,16 +3,7 @@ import { userActions } from "../store/user-slice";
 import { useAppSelector } from "../hooks/custom-useSelector";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  NavBar,
-  Logo,
-  LogoContainer,
-  LogoUnderline,
-  NavBarLinks,
-  NavLink,
-  NavHr,
-  ButtonLink,
-} from "../components/GlobalComponents";
+import NavBar from "../components/NavBar";
 
 import {
   Container,
@@ -60,12 +51,6 @@ const RecentGames: React.FC = () => {
     }
   }, [token, dispatch, navigate]);
 
-  const handlerLogout = () => {
-    console.log("Hello");
-    dispatch(userActions.logout());
-    console.log(token);
-  };
-
   const formatDate = (data: Date): string => {
     const dd = data.getDate();
     const mm = data.getMonth() + 1;
@@ -87,7 +72,7 @@ const RecentGames: React.FC = () => {
   const buildGameButton: React.FC<game> = (game) => {
     return (
       <FilterButton
-        className={filteredId === game.id ? 'active' : undefined}
+        className={filteredId === game.id ? "active" : undefined}
         type="button"
         bgColor={game.color}
         key={game.id}
@@ -122,17 +107,7 @@ const RecentGames: React.FC = () => {
   };
   return (
     <>
-      <NavBar>
-        <LogoContainer>
-          <Logo>TGL</Logo>
-          <LogoUnderline />
-        </LogoContainer>
-        <NavBarLinks>
-          <NavLink to="/">Account</NavLink>
-          <ButtonLink onClick={handlerLogout}>Sair</ButtonLink>
-        </NavBarLinks>
-      </NavBar>
-      <NavHr />
+      <NavBar />
       <Container>
         <HeaderContainer>
           <Title>RECENT GAMES</Title>
@@ -140,7 +115,7 @@ const RecentGames: React.FC = () => {
           {games.map((game) => {
             return buildGameButton(game);
           })}
-          <NewBetLink to="/">New Bet</NewBetLink>
+          <NewBetLink to="/new-bet">New Bet</NewBetLink>
         </HeaderContainer>
         {bets.map((bet) => {
           return buildRecentGame(JSON.parse(bet));

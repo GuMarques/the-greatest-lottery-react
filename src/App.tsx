@@ -4,6 +4,7 @@ import Registration from "./pages/Registration";
 import { Routes, Route } from "react-router-dom";
 import ResetPassword from "./pages/ResetPassword";
 import NotificationTab from "./components/NotificationTab";
+import NewBet from "./pages/NewBet";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/login" element={<Login />} /> 
         <Route path="/registration" element={<Registration />} />
         <Route path="/reset-password" element={<ResetPassword/>} />
+        <Route path="/new-bet" element={<NewBet/>} />
       </Routes>
     </div>
   );
