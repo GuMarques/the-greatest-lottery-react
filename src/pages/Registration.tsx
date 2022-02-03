@@ -1,39 +1,42 @@
 import Title from "../components/Title";
-import { Background, Container } from "../components/GlobalComponents";
 import {
+  Background,
+  Container,
   CustomForm,
   CustomHr,
   CustomInput,
-  CustomLoginArrow,
-  CustomLoginButton,
-  CustomSignUpButton,
-  AuthText
-} from "../components/LoginComponents";
+  CustomInvertedGrayArrow,
+  CustomConfirmButton,
+  CustomBackButton,
+  AuthText,
+  CustomGreenArrow,
+} from "../components/GlobalComponents";
 import arrow from "../assets/icons/arrow.svg";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { sendSignUpRequest, userActions } from "../store/user-slice";
 import React, { useEffect, useState } from "react";
 import { useAppSelector } from "../hooks/custom-useSelector";
+import { notificationActions } from "../store/notification-slice";
 const Registration = () => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const token = useAppSelector(store => store.user.token);
+  const token = useAppSelector((store) => store.user.token);
 
   useEffect(() => {
-    if(token.expires_at != "") {
+    if (token.expires_at !== "") {
       const expireAt = new Date(token.expires_at).getTime();
       var isExpired = expireAt - new Date().getTime() < 0;
-      if(isExpired) {
+      if (isExpired) {
         dispatch(userActions.logout());
       } else {
-        navigate('/');
+        navigate("/");
       }
     }
-  }, [token])
+  }, [token, dispatch, navigate]);
 
   const backHandler = () => {
     navigate(-1);
@@ -41,7 +44,18 @@ const Registration = () => {
 
   const signUpHandler = (event: React.FormEvent) => {
     event.preventDefault();
-    dispatch(sendSignUpRequest(name, email, password));
+
+    const emailValidate = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,})+$/i;
+    if (!email.match(emailValidate)) {
+      dispatch(
+        notificationActions.runNotification({
+          status: "error",
+          message: "This is not a valid email adress.",
+        })
+      );
+    } else {
+      dispatch(sendSignUpRequest(name, email, password));
+    }
   };
 
   return (
@@ -71,11 +85,13 @@ const Registration = () => {
             placeholder="Password"
           />
           <CustomHr />
-          <CustomLoginButton type="submit">
-            Register <CustomLoginArrow src={arrow} />
-          </CustomLoginButton>
+          <CustomConfirmButton type="submit">
+            Register <CustomGreenArrow src={arrow} />
+          </CustomConfirmButton>
         </CustomForm>
-        <CustomSignUpButton onClick={backHandler}>Back</CustomSignUpButton>
+        <CustomBackButton onClick={backHandler}>
+          <CustomInvertedGrayArrow src={arrow} /> Back
+        </CustomBackButton>
       </Container>
     </Background>
   );

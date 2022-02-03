@@ -1,15 +1,16 @@
+import { ForgetPasswordLink } from "../components/LoginComponents";
 import {
+  Background,
+  Container,
+  CustomConfirmButton,
+  CustomBackButton,
+  CustomGreenArrow,
+  CustomGrayArrow,
   AuthText,
   CustomForm,
   CustomInput,
   CustomHr,
-  ForgetPasswordLink,
-  CustomLoginButton,
-  CustomSignUpButton,
-  CustomLoginArrow,
-  CustomSignUpArrow,
-} from "../components/LoginComponents";
-import { Background, Container } from "../components/GlobalComponents";
+} from "../components/GlobalComponents";
 import Title from "../components/Title";
 import arrow from "../assets/icons/arrow.svg";
 import React, { useState, useEffect } from "react";
@@ -17,9 +18,10 @@ import { useDispatch } from "react-redux";
 import { sendLoginRequest, userActions } from "../store/user-slice";
 import { useAppSelector } from "../hooks/custom-useSelector";
 import { useNavigate } from "react-router-dom";
+import { notificationActions } from "../store/notification-slice";
 const Login: React.FC = () => {
-  const [email, setEmail] = useState<string>("user@teste.com");
-  const [password, setPassword] = useState<string>("secret");
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const dispatch = useDispatch();
   const token = useAppSelector((state) => state.user.token);
   const navigate = useNavigate();
@@ -38,8 +40,17 @@ const Login: React.FC = () => {
 
   const loginHandler = (event: React.FormEvent) => {
     event.preventDefault();
-
-    dispatch(sendLoginRequest(email, password));
+    const emailValidate = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,})+$/i;
+    if (!email.match(emailValidate)) {
+      dispatch(
+        notificationActions.runNotification({
+          status: "error",
+          message: "This is not a valid email adress.",
+        })
+      );
+    } else {
+      dispatch(sendLoginRequest(email, password));
+    }
   };
 
   const registrationRedirect = () => {
@@ -68,14 +79,16 @@ const Login: React.FC = () => {
             required
           />
           <CustomHr />
-          <ForgetPasswordLink to="/reset-password">I forget my password</ForgetPasswordLink>
-          <CustomLoginButton>
-            Log In <CustomLoginArrow src={arrow} />
-          </CustomLoginButton>
+          <ForgetPasswordLink to="/reset-password">
+            I forget my password
+          </ForgetPasswordLink>
+          <CustomConfirmButton>
+            Log In <CustomGreenArrow src={arrow} />
+          </CustomConfirmButton>
         </CustomForm>
-        <CustomSignUpButton onClick={registrationRedirect}>
-          Sign Up <CustomSignUpArrow src={arrow} />
-        </CustomSignUpButton>
+        <CustomBackButton onClick={registrationRedirect}>
+          Sign Up <CustomGrayArrow src={arrow} />
+        </CustomBackButton>
       </Container>
     </Background>
   );

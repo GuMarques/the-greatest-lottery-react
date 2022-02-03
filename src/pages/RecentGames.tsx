@@ -10,7 +10,6 @@ import {
   HeaderContainer,
   Title,
   FiltersText,
-  FilterButton,
   GameContainer,
   InfosContainer,
   GameBar,
@@ -18,11 +17,14 @@ import {
   GameInfos,
   GameName,
   NewBetLink,
+  CustomNewBetArrow,
 } from "../components/RecentGamesComponents";
 import { getBetsFromAPI } from "../store/bets-slice";
 import bet from "../interfaces/bet";
 import { getGamesFromAPI } from "../store/games-slice";
 import game from "../interfaces/game";
+import arrow from "../assets/icons/arrow.svg";
+import { GameButton } from "../components/GlobalComponents";
 
 const RecentGames: React.FC = () => {
   const [filteredId, setFilteredId] = useState<number | null>(null);
@@ -71,7 +73,7 @@ const RecentGames: React.FC = () => {
 
   const buildGameButton: React.FC<game> = (game) => {
     return (
-      <FilterButton
+      <GameButton
         className={filteredId === game.id ? "active" : undefined}
         type="button"
         bgColor={game.color}
@@ -79,7 +81,7 @@ const RecentGames: React.FC = () => {
         onClick={() => handleFilter(game.id)}
       >
         {game.type}
-      </FilterButton>
+      </GameButton>
     );
   };
 
@@ -115,7 +117,9 @@ const RecentGames: React.FC = () => {
           {games.map((game) => {
             return buildGameButton(game);
           })}
-          <NewBetLink to="/new-bet">New Bet</NewBetLink>
+          <NewBetLink to="/new-bet">
+            New Bet <CustomNewBetArrow src={arrow} />
+          </NewBetLink>
         </HeaderContainer>
         {bets.map((bet) => {
           return buildRecentGame(JSON.parse(bet));

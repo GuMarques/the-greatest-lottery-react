@@ -4,7 +4,6 @@ import React from "react";
 import { notificationActions } from "./notification-slice";
 
 const initialLoginState = {
-  status: "Not Logged In",
   name: "",
   email: "",
   token: {
@@ -12,6 +11,8 @@ const initialLoginState = {
     token: "",
     expires_at: "",
   },
+  resetPasswordToken: "",
+  navigateTo: "",
 };
 
 export const userSlice = createSlice({
@@ -20,7 +21,6 @@ export const userSlice = createSlice({
   reducers: {
     login(state, action) {
       state.email = action.payload.email;
-      state.status = "Logged In";
       state.name = action.payload.name;
       state.token = action.payload.token;
     },
@@ -33,9 +33,14 @@ export const userSlice = createSlice({
         expires_at: "",
       };
     },
-    loginFailed(state, action) {
+    loginFailed(state) {
       state.email = "";
-      state.status = "Error on Login: " + action.payload.error;
+    },
+    resetPasswordSetToken(state, action) {
+      state.resetPasswordToken = action.payload;
+    },
+    navigateAfterResetPassword(state, action) {
+      state.navigateTo = action.payload;
     },
   },
 });
@@ -59,7 +64,12 @@ export const sendLoginRequest = (email: string, password: string) => {
         );
       })
       .catch((error) => {
-        dispatch(userActions.loginFailed({ error: error.message }));
+        dispatch(
+          notificationActions.runNotification({
+            status: "error",
+            message: error.response.data.message,
+          })
+        );
       });
   };
 };
@@ -77,10 +87,12 @@ export const sendSignUpRequest = (
         password,
       })
       .then((res) => {
-        dispatch(notificationActions.runNotification({
-          status: 'sucess',
-          message: 'Your account has been sucessfully created!'
-        }))
+        dispatch(
+          notificationActions.runNotification({
+            status: "sucess",
+            message: "Your account has been sucessfully created!",
+          })
+        );
         dispatch(
           userActions.login({
             email,
@@ -92,20 +104,54 @@ export const sendSignUpRequest = (
   };
 };
 
-export const sendResetEmailRequest = (email: string) => {
-return (dispatch: React.Dispatch<any>) => {
-  axios.post("http://127.0.0.1:3333/reset", {
-    email
-  }).then((res) => {
-    dispatch(notificationActions.runNotification({
-      status: 'sucess',
-      message: 'An code has been sended to your email'
-    }))
-  }).catch((err) => {
-    dispatch(notificationActions.runNotification({
-      status: 'error',
-      message: err.message
-    }))
-  })
-}
-}
+export const sendResetPasswordRequest = (email: string) => {
+  return (dispatch: React.Dispatch<any>) => {
+    axios
+      .post("http://127.0.0.1:3333/reset", {
+        email,
+      })
+      .then((res) => {
+        dispatch(userActions.resetPasswordSetToken(res.data.token));
+      })
+      .catch((err) => {
+        dispatch(
+          notificationActions.runNotification({
+            status: "error",
+            message: err.response.data.errors[0].message,
+          })
+        );
+      });
+  };
+};
+
+export const sendChangePasswordRequest = (
+  token: string,
+  newPassword: string
+) => {
+  return (dispatch: React.Dispatch<any>) => {
+    axios
+      .post("http://127.0.0.1:3333/reset/" + token, {
+        password: newPassword,
+      })
+      .then(() => {
+        dispatch(
+          notificationActions.runNotification({
+            status: "sucess",
+            message: "Password updated successfully!",
+          })
+        );
+        dispatch(userActions.resetPasswordSetToken(''));
+        dispatch(userActions.navigateAfterResetPassword("/login"));
+      })
+      .catch(() => {
+        dispatch(
+          notificationActions.runNotification({
+            status: "error",
+            message: "Fail to update password. Please try again. ",
+          })
+        );
+        dispatch(userActions.resetPasswordSetToken(''));
+        dispatch(userActions.navigateAfterResetPassword("/reset-password"));
+      });
+  };
+};

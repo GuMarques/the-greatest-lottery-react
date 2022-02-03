@@ -1,32 +1,57 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Background, Container } from "../components/GlobalComponents";
 import {
+  Background,
+  Container,
   CustomForm,
   CustomHr,
   CustomInput,
-  CustomLoginArrow,
-  CustomLoginButton,
-  CustomSignUpButton,
+  CustomGreenArrow,
+  CustomConfirmButton,
+  CustomBackButton,
   AuthText,
-} from "../components/LoginComponents";
+  CustomInvertedGrayArrow,
+} from "../components/GlobalComponents";
 import Title from "../components/Title";
-import { sendResetEmailRequest } from "../store/user-slice";
+import { useAppSelector } from "../hooks/custom-useSelector";
+import { notificationActions } from "../store/notification-slice";
+import { sendResetPasswordRequest } from "../store/user-slice";
+import arrow from "../assets/icons/arrow.svg";
 
 const ResetPassword = () => {
   const [email, setEmail] = useState<string>("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const resetPasswordToken = useAppSelector(
+    (state) => state.user.resetPasswordToken
+  );
+
+  useEffect(() => {
+    if (resetPasswordToken !== "") {
+      navigate("/change-password");
+    }
+  }, [resetPasswordToken, navigate]);
+
   const sendLinkHandler = (event: React.FormEvent) => {
     event.preventDefault();
-    dispatch(sendResetEmailRequest(email));
-  }
+    const emailValidate = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,})+$/i;
+    if (!email.match(emailValidate)) {
+      dispatch(
+        notificationActions.runNotification({
+          status: "error",
+          message: "This is not a valid email adress.",
+        })
+      );
+    } else {
+      dispatch(sendResetPasswordRequest(email));
+    }
+  };
 
   const backButtonHandler = () => {
     navigate(-1);
-  }
+  };
   return (
     <Background>
       <Title />
@@ -41,9 +66,11 @@ const ResetPassword = () => {
             required
           />
           <CustomHr />
-          <CustomLoginButton type="submit">Send link</CustomLoginButton>
+          <CustomConfirmButton type="submit">Confirm Email <CustomGreenArrow src={arrow} /></CustomConfirmButton>
         </CustomForm>
-        <CustomSignUpButton onClick={backButtonHandler}>Back</CustomSignUpButton>
+        <CustomBackButton onClick={backButtonHandler}>
+        <CustomInvertedGrayArrow src={arrow} /> Back
+        </CustomBackButton>
       </Container>
     </Background>
   );

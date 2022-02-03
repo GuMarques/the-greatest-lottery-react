@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
@@ -15,29 +15,22 @@ import {
   ActionButtonsContainer,
   CartContainer,
   CartTitle,
-  CartGameBar,
-  CartGameContainer,
-  CartGameInfos,
-  CartGameName,
-  CartGameNumbers,
-  CartInfosContainer,
-  TrashIcon,
   SaveButton,
   CartTotal,
   CartItensContainer,
-  CartGameNameContainer,
-  CartGamePrice,
   EmptyCartText,
+  CustomSaveArrow,
 } from "../components/NewBetComponents";
-import { FilterButton } from "../components/RecentGamesComponents";
 import { useAppSelector } from "../hooks/custom-useSelector";
 import game from "../interfaces/game";
 import { getGamesFromAPI } from "../store/games-slice";
 import { notificationActions } from "../store/notification-slice";
 import { numberAction } from "../store/numbers-slice";
 import { userActions } from "../store/user-slice";
-import trash from "../assets/icons/trash.svg";
 import { addBetToCart, cartActions, sendBetToAPI } from "../store/cart-slice";
+import CartItem from "../components/CartItem";
+import arrow from "../assets/icons/arrow.svg";
+import { GameButton } from "../components/GlobalComponents";
 
 const NewBet = () => {
   const [selectedGame, setSelectedGame] = useState<game | null>(null);
@@ -52,10 +45,6 @@ const NewBet = () => {
   const cart = useAppSelector((state) => state.cart);
 
   const numbers = useAppSelector((state) => state.numbers);
-
-  useEffect(() => {
-    console.log(cart);
-  }, [cart]);
 
   useEffect(() => {
     if (token.expires_at !== "") {
@@ -79,7 +68,7 @@ const NewBet = () => {
   const buildGameButton: React.FC<game> = (game, index) => {
     if (index === 0) {
       return (
-        <FilterButton
+        <GameButton
           className={selectedGame?.id === game.id ? "active" : undefined}
           type="button"
           bgColor={game.color}
@@ -88,11 +77,11 @@ const NewBet = () => {
           ref={firstBtnRef}
         >
           {game.type}
-        </FilterButton>
+        </GameButton>
       );
     } else {
       return (
-        <FilterButton
+        <GameButton
           className={selectedGame?.id === game.id ? "active" : undefined}
           type="button"
           bgColor={game.color}
@@ -100,7 +89,7 @@ const NewBet = () => {
           onClick={() => handlerGameButtonClick(game)}
         >
           {game.type}
-        </FilterButton>
+        </GameButton>
       );
     }
   };
@@ -111,6 +100,26 @@ const NewBet = () => {
       setSelectedGame(game);
     }
   };
+
+  const handlerBoardButtonClick = useCallback((number: number) => {
+    const button = document.querySelector("#boardButton-" + number);
+    if (numbers.indexOf(number) === -1) {
+      if (numbers.length === selectedGame?.max_number) {
+        dispatch(
+          notificationActions.runNotification({
+            status: "error",
+            message: "You have already selected the maximum numbers for this game.",
+          })
+        );
+      } else {
+        button?.classList.toggle("selected");
+        dispatch(numberAction.addNumber(number));
+      }
+    } else {
+      button?.classList.toggle("selected");
+      dispatch(numberAction.removeNumber(number));
+    }
+  }, [numbers, dispatch, selectedGame]);
 
   useEffect(() => {
     let tempButtons: JSX.Element[] = [];
@@ -127,27 +136,7 @@ const NewBet = () => {
       );
     }
     setBoardButtons(tempButtons);
-  }, [selectedGame, numbers]);
-
-  const handlerBoardButtonClick = (number: number) => {
-    const button = document.querySelector("#boardButton-" + number);
-    if (numbers.indexOf(number) === -1) {
-      if (numbers.length === selectedGame?.max_number) {
-        dispatch(
-          notificationActions.runNotification({
-            status: "error",
-            message: "Você já selecionou o máximo de números para esse jogo.",
-          })
-        );
-      } else {
-        button?.classList.toggle("selected");
-        dispatch(numberAction.addNumber(number));
-      }
-    } else {
-      button?.classList.toggle("selected");
-      dispatch(numberAction.removeNumber(number));
-    }
-  };
+  }, [selectedGame, numbers, handlerBoardButtonClick]);
 
   const handlerClearButtonClick = () => {
     numbers.forEach((value) => {
@@ -179,9 +168,9 @@ const NewBet = () => {
         notificationActions.runNotification({
           status: "error",
           message:
-            "Você precisa selecionar mais " +
+            "You need to select " +
             numbersToFill +
-            " para realizar essa aposta.",
+            " more numbers to complete this bet.",
         })
       );
     } else {
@@ -189,6 +178,7 @@ const NewBet = () => {
         name: selectedGame.type,
         price: selectedGame.price,
         game_id: selectedGame.id,
+        color: selectedGame.color,
         numbers: [...numbers].sort(function (a: number, b: number) {
           return a - b;
         }),
@@ -198,51 +188,15 @@ const NewBet = () => {
     }
   };
 
-  const buildCartItem = (game: {
-    name: string;
-    price: number;
-    game_id: number;
-    numbers: number[];
-  }): JSX.Element => {
-    const gameColor = games.find((item) => item.id === game.game_id);
-    const pNumbers = game.numbers.map((number, index, array) => {
-      let response = "";
-      if (index !== 0) {
-        response += ", ";
-      }
-      if (number <= 9) {
-        response += "0";
-      }
-      response += "" + number;
-      if (index + 1 === array.length) {
-        response += ".";
-      }
-      return response;
-    });
-    return (
-      <CartGameContainer key={game.name + game.numbers.toString()}>
-        <TrashIcon onClick={() => handlerRemoveCartItem(game)} src={trash} />
-        <CartGameBar bgColor={gameColor?.color} />
-        <CartInfosContainer>
-          <CartGameNumbers>{pNumbers}</CartGameNumbers>
-          <CartGameNameContainer>
-            <CartGameName bgColor={gameColor?.color}>{game.name}</CartGameName>
-            <CartGamePrice>
-              R$ {game.price.toFixed(2).replace(".", ",")}
-            </CartGamePrice>
-          </CartGameNameContainer>
-        </CartInfosContainer>
-      </CartGameContainer>
-    );
-  };
-
   const handlerRemoveCartItem = (game: {
     name: string;
     price: number;
+    color: string;
     game_id: number;
     numbers: number[];
   }) => {
-    dispatch(cartActions.removeItem(game));
+    const index = cart.games.indexOf(game);
+    dispatch(cartActions.removeItem({ index: index, price: game.price }));
   };
 
   const handlerSaveClick = () => {
@@ -280,7 +234,13 @@ const NewBet = () => {
           <CartTitle>Cart</CartTitle>
           <CartItensContainer>
             {cart.games.map((game) => {
-              return buildCartItem(game);
+              return (
+                <CartItem
+                  game={game}
+                  handlerRemoveCartItem={handlerRemoveCartItem}
+                  key={game.name + game.numbers.toString()}
+                />
+              );
             })}
             {cart.games.length === 0 ? (
               <EmptyCartText>
@@ -291,7 +251,9 @@ const NewBet = () => {
           <CartTotal>
             CART TOTAL: R$ {cart.total.toFixed(2).replace(".", ",")}
           </CartTotal>
-          <SaveButton onClick={handlerSaveClick}>Save </SaveButton>
+          <SaveButton onClick={handlerSaveClick}>
+            Save <CustomSaveArrow src={arrow} />
+          </SaveButton>
         </CartContainer>
       </ContentSection>
     </>

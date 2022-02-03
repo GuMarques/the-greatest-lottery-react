@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import React from "react";
-import { useAppSelector } from "../hooks/custom-useSelector";
 import Cart from "../interfaces/cart";
 import { notificationActions } from "./notification-slice";
 
@@ -16,8 +15,8 @@ export const cartSlice = createSlice({
       state.total += action.payload.price;
     },
     removeItem(state, action) {
-      const index = state.games.indexOf(action.payload);
-      state.games.splice(index, 1);
+      state.total-=action.payload.price;
+      state.games.splice(action.payload.index, 1);
     },
     clearCart(_) {
       return initialCartState;
@@ -30,6 +29,7 @@ export const addBetToCart = (
   game: {
     name: string;
     price: number;
+    color: string,
     game_id: number;
     numbers: number[];
   }

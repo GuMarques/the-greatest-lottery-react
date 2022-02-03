@@ -36,31 +36,6 @@ export const FiltersText = styled.p`
   margin-top: 4px;
 `;
 
-export const FilterButton = styled.button<GameColorType>`
-  border-radius: 100px;
-  border: 2px solid ${(props: GameColorType) =>
-    props.bgColor !== undefined ? props.bgColor : "#7f3992"};;
-  background-color: white;
-  width: 113px;
-  height: 34px;
-  font-size: 14px;
-  font-style: italic;
-  color: ${(props: GameColorType) =>
-    props.bgColor !== undefined ? props.bgColor : "#7f3992"};
-  margin-right: 25px;
-  font-weight: bold;
-  :hover {
-    background-color: ${(props: GameColorType) =>
-    props.bgColor !== undefined ? props.bgColor : "#7f3992"};
-    color: white;
-  }
-  &.active {
-    background-color: ${(props: GameColorType) =>
-    props.bgColor !== undefined ? props.bgColor : "#7f3992"};
-    color: white;
-  }
-`;
-
 export const NewBetLink = styled(Link)`
   font-size: 24px;
   color: #B5C401;
@@ -116,6 +91,14 @@ export const GameName = styled.p<GameColorType>`
   margin-right: 14px;
   font-style: italic;
   font-weight: bold;
+`;
+
+export const CustomNewBetArrow = styled.img`
+  height: 20.27px;
+  filter: invert(83%) sepia(32%) saturate(4604%) hue-rotate(19deg) brightness(95%) contrast(99%);
+  :hover {
+    filter: invert(54%) sepia(73%) saturate(1290%) hue-rotate(31deg) brightness(99%) contrast(101%);
+  }
 `;
 
 type GameColorType = {

@@ -5,6 +5,7 @@ import { Routes, Route } from "react-router-dom";
 import ResetPassword from "./pages/ResetPassword";
 import NotificationTab from "./components/NotificationTab";
 import NewBet from "./pages/NewBet";
+import NewPassword from "./pages/NewPassword";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/registration" element={<Registration />} />
         <Route path="/reset-password" element={<ResetPassword/>} />
         <Route path="/new-bet" element={<NewBet/>} />
+        <Route path="/change-password" element={<NewPassword/>} />
       </Routes>
     </div>
   );
