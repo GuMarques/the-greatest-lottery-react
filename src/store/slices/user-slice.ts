@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import React from "react";
+import instance from "../../shared/services/axios.config";
 import { notificationActions } from "./notification-slice";
 
 const initialLoginState = {
@@ -80,8 +81,8 @@ export const sendSignUpRequest = (
   password: string
 ) => {
   return (dispatch: React.Dispatch<any>) => {
-    axios
-      .post("http://127.0.0.1:3333/user/create", {
+    instance
+      .post("/user/create", {
         name,
         email,
         password,
@@ -140,7 +141,7 @@ export const sendChangePasswordRequest = (
             message: "Password updated successfully!",
           })
         );
-        dispatch(userActions.resetPasswordSetToken(''));
+        dispatch(userActions.resetPasswordSetToken(""));
         dispatch(userActions.navigateAfterResetPassword("/login"));
       })
       .catch(() => {
@@ -150,7 +151,7 @@ export const sendChangePasswordRequest = (
             message: "Fail to update password. Please try again. ",
           })
         );
-        dispatch(userActions.resetPasswordSetToken(''));
+        dispatch(userActions.resetPasswordSetToken(""));
         dispatch(userActions.navigateAfterResetPassword("/reset-password"));
       });
   };

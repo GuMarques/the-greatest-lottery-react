@@ -8,12 +8,12 @@ import {
   NavLink,
   NavHr,
   ButtonLink,
-} from "../components/NavBarComponents";
-import { betActions } from "../store/bets-slice";
-import { cartActions } from "../store/cart-slice";
-import { gameActions } from "../store/games-slice";
-import { numberAction } from "../store/numbers-slice";
-import { userActions } from "../store/user-slice";
+} from "./styles";
+import { betActions } from "../../store/slices/bets-slice";
+import { cartActions } from "../../store/slices/cart-slice";
+import { gameActions } from "../../store/slices/games-slice";
+import { numberAction } from "../../store/slices/numbers-slice";
+import { userActions } from "../../store/slices/user-slice";
 
 const NavBar = () => {
 

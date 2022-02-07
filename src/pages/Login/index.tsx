@@ -1,35 +1,35 @@
-import Title from "../components/Title";
+import { ForgetPasswordLink } from "./styles";
 import {
   Background,
   Container,
-  CustomForm,
-  CustomHr,
-  CustomInput,
-  CustomInvertedGrayArrow,
   CustomConfirmButton,
   CustomBackButton,
-  AuthText,
   CustomGreenArrow,
-} from "../components/GlobalComponents";
+  CustomGrayArrow,
+  AuthText,
+  CustomForm,
+  CustomInput,
+  CustomHr,
+} from "../../shared/global/global-styles";
+import Title from "../../components/Title";
 import arrow from "../assets/icons/arrow.svg";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { sendSignUpRequest, userActions } from "../store/user-slice";
-import React, { useEffect, useState } from "react";
-import { useAppSelector } from "../hooks/custom-useSelector";
-import { notificationActions } from "../store/notification-slice";
-const Registration = () => {
-  const [name, setName] = useState<string>("");
+import { sendLoginRequest, userActions } from "../../store/slices/user-slice";
+import { useAppSelector } from "../../shared/hooks/custom-useSelector";
+import { useNavigate } from "react-router-dom";
+import { notificationActions } from "../../store/slices/notification-slice";
+const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const token = useAppSelector((store) => store.user.token);
+  const token = useAppSelector(({ user }) => user.token);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (token.expires_at !== "") {
       const expireAt = new Date(token.expires_at).getTime();
-      var isExpired = expireAt - new Date().getTime() < 0;
+      const isExpired = expireAt - new Date().getTime() <= 0;
       if (isExpired) {
         dispatch(userActions.logout());
       } else {
@@ -38,13 +38,8 @@ const Registration = () => {
     }
   }, [token, dispatch, navigate]);
 
-  const backHandler = () => {
-    navigate(-1);
-  };
-
-  const signUpHandler = (event: React.FormEvent) => {
+  const loginHandler = (event: React.FormEvent) => {
     event.preventDefault();
-
     const emailValidate = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,})+$/i;
     if (!email.match(emailValidate)) {
       dispatch(
@@ -54,28 +49,26 @@ const Registration = () => {
         })
       );
     } else {
-      dispatch(sendSignUpRequest(name, email, password));
+      dispatch(sendLoginRequest(email, password));
     }
+  };
+
+  const registrationRedirect = () => {
+    navigate("/registration");
   };
 
   return (
     <Background>
       <Title />
       <Container>
-        <AuthText>Registration</AuthText>
-        <CustomForm onSubmit={signUpHandler}>
-          <CustomInput
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            type="text"
-            placeholder="Name"
-          />
-          <CustomHr />
+        <AuthText>Authentication</AuthText>
+        <CustomForm onSubmit={loginHandler}>
           <CustomInput
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            type="text"
+            type="email"
             placeholder="Email"
+            required
           />
           <CustomHr />
           <CustomInput
@@ -83,18 +76,22 @@ const Registration = () => {
             onChange={(e) => setPassword(e.target.value)}
             type="password"
             placeholder="Password"
+            required
           />
           <CustomHr />
-          <CustomConfirmButton type="submit">
-            Register <CustomGreenArrow src={arrow} />
+          <ForgetPasswordLink to="/reset-password">
+            I forget my password
+          </ForgetPasswordLink>
+          <CustomConfirmButton>
+            Log In <CustomGreenArrow src={arrow} />
           </CustomConfirmButton>
         </CustomForm>
-        <CustomBackButton onClick={backHandler}>
-          <CustomInvertedGrayArrow src={arrow} /> Back
+        <CustomBackButton onClick={registrationRedirect}>
+          Sign Up <CustomGrayArrow src={arrow} />
         </CustomBackButton>
       </Container>
     </Background>
   );
 };
 
-export default Registration;
+export default Login;

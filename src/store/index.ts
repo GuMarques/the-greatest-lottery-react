@@ -1,10 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { betSlice } from "./bets-slice";
-import { cartSlice } from "./cart-slice";
-import { gameSlice } from "./games-slice";
-import { notificationSlice } from "./notification-slice";
-import { numberSlice } from "./numbers-slice";
-import { userSlice } from "./user-slice";
+import { betSlice } from "./slices/bets-slice";
+import { cartSlice } from "./slices/cart-slice";
+import { gameSlice } from "./slices/games-slice";
+import { notificationSlice } from "./slices/notification-slice";
+import { numberSlice } from "./slices/numbers-slice";
+import { userSlice } from "./slices/user-slice";
 
 const store = configureStore({
   reducer: {

@@ -22,35 +22,17 @@ export const Container = styled.div`
   margin-bottom: auto;
 `;
 
-export const StartTitle = styled.h1`
-  color: #707070;
-  font-size: 65px;
-  text-align: center;
-  margin: 0;
+export const CustomInput = styled.input`
+  font-size: 17px;
+  font-weight: bold;
   font-style: italic;
-`;
-
-export const MiddleTitle = styled.h2`
-  color: #ffffff;
-  background-color: #b5c401;
-  font-size: 22px;
-  border-radius: 100px;
-  width: 144px;
-  height: 39px;
-  text-align: center;
-  vertical-align: middle;
-  font-style: italic;
-  margin: 0;
-  margin-top: 30px;
-  margin-bottom: 20px;
-`;
-
-export const EndTitle = styled.h1`
-  color: #707070;
-  font-size: 83px;
-  text-align: center;
-  margin: 0;
-  font-style: italic;
+  min-height: 80px;
+  border: none;
+  outline: none;
+  color: #9d9d9d;
+  ::placeholder {
+    color: #9d9d9d;
+  }
 `;
 
 export const CustomGreenArrow = styled.img`
@@ -87,25 +69,25 @@ export const CustomInvertedGrayArrow = styled.img`
 export const GameButton = styled.button<GameColorType>`
   border-radius: 100px;
   border: 2px solid
-    ${(props: GameColorType) =>
-      props.bgColor !== undefined ? props.bgColor : "#7f3992"};
+    ${({ bgColor }: GameColorType) =>
+      bgColor !== undefined ? bgColor : "#7f3992"};
   background-color: white;
   width: 113px;
   height: 34px;
   font-size: 14px;
   font-style: italic;
-  color: ${(props: GameColorType) =>
-    props.bgColor !== undefined ? props.bgColor : "#7f3992"};
+  color: ${({ bgColor }: GameColorType) =>
+    bgColor !== undefined ? bgColor : "#7f3992"};
   margin-right: 25px;
   font-weight: bold;
   :hover {
-    background-color: ${(props: GameColorType) =>
-      props.bgColor !== undefined ? props.bgColor : "#7f3992"};
+    background-color: ${({ bgColor }: GameColorType) =>
+      bgColor !== undefined ? bgColor : "#7f3992"};
     color: white;
   }
   &.active {
-    background-color: ${(props: GameColorType) =>
-      props.bgColor !== undefined ? props.bgColor : "#7f3992"};
+    background-color: ${({ bgColor }: GameColorType) =>
+      bgColor !== undefined ? bgColor : "#7f3992"};
     color: white;
   }
   cursor: pointer;
@@ -123,19 +105,6 @@ export const CustomForm = styled.form`
   padding-right: 27px;
   padding-left: 30px;
   background-color: white;
-`;
-
-export const CustomInput = styled.input`
-  font-size: 17px;
-  font-weight: bold;
-  font-style: italic;
-  min-height: 80px;
-  border: none;
-  outline: none;
-  color: #9d9d9d;
-  ::placeholder {
-    color: #9d9d9d;
-  }
 `;
 
 export const CustomHr = styled.hr`

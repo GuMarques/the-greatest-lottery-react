@@ -7,7 +7,7 @@ import {
   CartGamePrice,
   CartInfosContainer,
   TrashIcon,
-} from "./CartComponents";
+} from "./styled";
 import trash from "../assets/icons/trash.svg";
 
 interface game {

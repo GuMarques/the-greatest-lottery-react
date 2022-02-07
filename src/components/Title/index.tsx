@@ -3,7 +3,7 @@ import {
   StartTitle,
   MiddleTitle,
   EndTitle,
-} from "../components/GlobalComponents";
+} from "./styles";
 
 const Title = () => {
   return (

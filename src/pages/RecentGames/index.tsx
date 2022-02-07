@@ -1,9 +1,9 @@
 import { useDispatch } from "react-redux";
-import { userActions } from "../store/user-slice";
-import { useAppSelector } from "../hooks/custom-useSelector";
+import { userActions } from "../../store/slices/user-slice";
+import { useAppSelector } from "../../shared/hooks/custom-useSelector";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import NavBar from "../components/NavBar";
+import NavBar from "../../components/NavBar";
 
 import {
   Container,
@@ -18,13 +18,13 @@ import {
   GameName,
   NewBetLink,
   CustomNewBetArrow,
-} from "../components/RecentGamesComponents";
-import { getBetsFromAPI } from "../store/bets-slice";
-import bet from "../interfaces/bet";
-import { getGamesFromAPI } from "../store/games-slice";
-import game from "../interfaces/game";
+} from "./styles";
+import { getBetsFromAPI } from "../../store/slices/bets-slice";
+import bet from "../../shared/interfaces/bet";
+import { getGamesFromAPI } from "../../store/slices/games-slice";
+import game from "../../shared/interfaces/game";
 import arrow from "../assets/icons/arrow.svg";
-import { GameButton } from "../components/GlobalComponents";
+import { AuthText, GameButton } from "../../shared/global/global-styles";
 
 const RecentGames: React.FC = () => {
   const [filteredId, setFilteredId] = useState<number | null>(null);
@@ -124,6 +124,9 @@ const RecentGames: React.FC = () => {
         {bets.map((bet) => {
           return buildRecentGame(JSON.parse(bet));
         })}
+        {
+          bets.length === 0 ? <AuthText>You don't have any games yet, make a bet!</AuthText> : null
+        }
       </Container>
     </>
   );

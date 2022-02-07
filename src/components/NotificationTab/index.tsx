@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { useAppSelector } from "../hooks/custom-useSelector";
-import { notificationActions } from "../store/notification-slice";
+import { useAppSelector } from "../../shared/hooks/custom-useSelector";
+import { notificationActions } from "../../store/slices/notification-slice";
 import {
   NotificationParagraph,
   CustomNotificationTab,
-} from "./NotificationTabComponents";
+} from "./styles";
 
 const NotificationTab = () => {
   const notification = useAppSelector((state) => state.notification);

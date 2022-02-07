@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import NavBar from "../components/NavBar";
+import NavBar from "../../components/NavBar";
 import {
   ActionButton,
   AddToCartButton,
@@ -20,17 +20,17 @@ import {
   CartItensContainer,
   EmptyCartText,
   CustomSaveArrow,
-} from "../components/NewBetComponents";
-import { useAppSelector } from "../hooks/custom-useSelector";
-import game from "../interfaces/game";
-import { getGamesFromAPI } from "../store/games-slice";
-import { notificationActions } from "../store/notification-slice";
-import { numberAction } from "../store/numbers-slice";
-import { userActions } from "../store/user-slice";
-import { addBetToCart, cartActions, sendBetToAPI } from "../store/cart-slice";
-import CartItem from "../components/CartItem";
+} from "./styled";
+import { useAppSelector } from "../../shared/hooks/custom-useSelector";
+import game from "../../shared/interfaces/game";
+import { getGamesFromAPI } from "../../store/slices/games-slice";
+import { notificationActions } from "../../store/slices/notification-slice";
+import { numberAction } from "../../store/slices/numbers-slice";
+import { userActions } from "../../store/slices/user-slice";
+import { addBetToCart, cartActions, sendBetToAPI } from "../../store/slices/cart-slice";
+import CartItem from "../../components/CartItem";
 import arrow from "../assets/icons/arrow.svg";
-import { GameButton } from "../components/GlobalComponents";
+import { GameButton } from "../../shared/global/global-styles";
 
 const NewBet = () => {
   const [selectedGame, setSelectedGame] = useState<game | null>(null);

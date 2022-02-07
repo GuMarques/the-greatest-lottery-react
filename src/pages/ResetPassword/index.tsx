@@ -12,11 +12,11 @@ import {
   CustomBackButton,
   AuthText,
   CustomInvertedGrayArrow,
-} from "../components/GlobalComponents";
-import Title from "../components/Title";
-import { useAppSelector } from "../hooks/custom-useSelector";
-import { notificationActions } from "../store/notification-slice";
-import { sendResetPasswordRequest } from "../store/user-slice";
+} from "../../shared/global/global-styles";
+import Title from "../../components/Title";
+import { useAppSelector } from "../../shared/hooks/custom-useSelector";
+import { notificationActions } from "../../store/slices/notification-slice";
+import { sendResetPasswordRequest } from "../../store/slices/user-slice";
 import arrow from "../assets/icons/arrow.svg";
 
 const ResetPassword = () => {
