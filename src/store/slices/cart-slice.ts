@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import React from "react";
-import Cart from "../../shared/interfaces/cart";
+import Cart from "@interfaces/cart";
 import { notificationActions } from "./notification-slice";
 
 const initialCartState: Cart = { games: [], total: 0 };

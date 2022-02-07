@@ -12,12 +12,12 @@ import {
   CustomBackButton,
   AuthText,
   CustomInvertedGrayArrow,
-} from "../../shared/global/global-styles";
-import Title from "../../components/Title";
-import { useAppSelector } from "../../shared/hooks/custom-useSelector";
-import { notificationActions } from "../../store/slices/notification-slice";
-import { sendResetPasswordRequest } from "../../store/slices/user-slice";
-import arrow from "../assets/icons/arrow.svg";
+} from "@global/global-styles";
+import Title from "@components/Title";
+import { useAppSelector } from "@hooks/custom-useSelector";
+import { notificationActions } from "@slices/notification-slice";
+import { sendResetPasswordRequest } from "@slices/user-slice";
+import arrow from "@icons/arrow.svg";
 
 const ResetPassword = () => {
   const [email, setEmail] = useState<string>("");

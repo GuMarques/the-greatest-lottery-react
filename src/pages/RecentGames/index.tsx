@@ -19,12 +19,12 @@ import {
   NewBetLink,
   CustomNewBetArrow,
 } from "./styles";
-import { getBetsFromAPI } from "../../store/slices/bets-slice";
-import bet from "../../shared/interfaces/bet";
-import { getGamesFromAPI } from "../../store/slices/games-slice";
-import game from "../../shared/interfaces/game";
-import arrow from "../assets/icons/arrow.svg";
-import { AuthText, GameButton } from "../../shared/global/global-styles";
+import { getBetsFromAPI } from "@slices/bets-slice";
+import bet from "@interfaces/bet";
+import { getGamesFromAPI } from "@slices/games-slice";
+import game from "@interfaces/game";
+import arrow from "@icons/arrow.svg";
+import { AuthText, GameButton } from "@global/global-styles";
 
 const RecentGames: React.FC = () => {
   const [filteredId, setFilteredId] = useState<number | null>(null);

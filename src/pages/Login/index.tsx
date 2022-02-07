@@ -10,15 +10,15 @@ import {
   CustomForm,
   CustomInput,
   CustomHr,
-} from "../../shared/global/global-styles";
-import Title from "../../components/Title";
-import arrow from "../assets/icons/arrow.svg";
+} from "@global/global-styles";
+import Title from "@components/Title";
+import arrow from "@icons/arrow.svg";
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { sendLoginRequest, userActions } from "../../store/slices/user-slice";
-import { useAppSelector } from "../../shared/hooks/custom-useSelector";
+import { sendLoginRequest, userActions } from "@slices/user-slice";
+import { useAppSelector } from "@hooks/custom-useSelector";
 import { useNavigate } from "react-router-dom";
-import { notificationActions } from "../../store/slices/notification-slice";
+import { notificationActions } from "@slices/notification-slice";
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");

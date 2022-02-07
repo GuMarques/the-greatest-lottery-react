@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import React from "react";
-import instance from "../../shared/services/axios.config";
+import instance from "@services/axios.config";
 import { notificationActions } from "./notification-slice";
 
 const initialLoginState = {

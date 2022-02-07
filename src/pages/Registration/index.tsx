@@ -1,4 +1,4 @@
-import Title from "../../components/Title";
+import Title from "@components/Title";
 import {
   Background,
   Container,
@@ -10,14 +10,14 @@ import {
   CustomBackButton,
   AuthText,
   CustomGreenArrow,
-} from "../../shared/global/global-styles";
-import arrow from "../assets/icons/arrow.svg";
+} from "@global/global-styles";
+import arrow from "@icons/arrow.svg";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { sendSignUpRequest, userActions } from "../../store/slices/user-slice";
+import { sendSignUpRequest, userActions } from "@slices/user-slice";
 import React, { useEffect, useState } from "react";
-import { useAppSelector } from "../../shared/hooks/custom-useSelector";
-import { notificationActions } from "../../store/slices/notification-slice";
+import { useAppSelector } from "@hooks/custom-useSelector";
+import { notificationActions } from "@slices/notification-slice";
 const Registration = () => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");

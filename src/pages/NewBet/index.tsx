@@ -21,16 +21,16 @@ import {
   EmptyCartText,
   CustomSaveArrow,
 } from "./styled";
-import { useAppSelector } from "../../shared/hooks/custom-useSelector";
-import game from "../../shared/interfaces/game";
-import { getGamesFromAPI } from "../../store/slices/games-slice";
-import { notificationActions } from "../../store/slices/notification-slice";
-import { numberAction } from "../../store/slices/numbers-slice";
-import { userActions } from "../../store/slices/user-slice";
-import { addBetToCart, cartActions, sendBetToAPI } from "../../store/slices/cart-slice";
-import CartItem from "../../components/CartItem";
-import arrow from "../assets/icons/arrow.svg";
-import { GameButton } from "../../shared/global/global-styles";
+import { useAppSelector } from "@hooks/custom-useSelector";
+import game from "@interfaces/game";
+import { getGamesFromAPI } from "@slices/games-slice";
+import { notificationActions } from "@slices/notification-slice";
+import { numberAction } from "@slices/numbers-slice";
+import { userActions } from "@slices/user-slice";
+import { addBetToCart, cartActions, sendBetToAPI } from "@slices/cart-slice";
+import CartItem from "@components/CartItem";
+import arrow from "@icons/arrow.svg";
+import { GameButton } from "@global/global-styles";
 
 const NewBet = () => {
   const [selectedGame, setSelectedGame] = useState<game | null>(null);

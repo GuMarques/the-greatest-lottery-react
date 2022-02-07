@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import React from "react";
 import { notificationActions } from "./notification-slice";
-import Bet from "../../shared/interfaces/bet";
+import Bet from "@interfaces/bet";
 
 const initialBetState: string[] = [];
 
