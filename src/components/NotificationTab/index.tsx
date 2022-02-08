@@ -1,41 +1,23 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { useAppSelector } from "../../shared/hooks/custom-useSelector";
-import { notificationActions } from "../../store/slices/notification-slice";
-import {
-  NotificationParagraph,
-  CustomNotificationTab,
-} from "./styles";
+import { useAppSelector } from "@hooks/custom-useSelector";
+import { notificationActions } from "@slices/notification-slice";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const NotificationTab = () => {
   const notification = useAppSelector((state) => state.notification);
   const dispatch = useDispatch();
-  let timeout: NodeJS.Timeout;
 
   useEffect(() => {
     if (notification.active) {
-      timeout = setTimeout(() => {
-        dispatch(notificationActions.dismissNotification());
-      }, 4000);
+      notification.status === 'sucess' ? toast.success(notification.message) : toast.error(notification.message)
+      dispatch(notificationActions.dismissNotification());
     }
   }, [notification.active]);
 
-  const handlerNotification = () => {
-    if (timeout !== null) clearTimeout(timeout);
-    dispatch(notificationActions.dismissNotification());
-  };
-
-  const cssClasses = [
-    notification.status,
-    notification.active ? "open" : "close",
-  ];
   return (
-    <CustomNotificationTab
-      className={cssClasses.join(" ")}
-      onClick={handlerNotification}
-    >
-      <NotificationParagraph>{notification.message}</NotificationParagraph>
-    </CustomNotificationTab>
+    <ToastContainer />
   );
 };
 

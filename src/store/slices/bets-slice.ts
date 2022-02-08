@@ -1,9 +1,8 @@
-import { createSlice } from "@reduxjs/toolkit";
-
-import axios from "axios";
 import React from "react";
+import { createSlice } from "@reduxjs/toolkit";
 import { notificationActions } from "./notification-slice";
 import Bet from "@interfaces/bet";
+import { Bet as ServiceBet } from "@services/index";
 
 const initialBetState: string[] = [];
 
@@ -24,38 +23,44 @@ export const betSlice = createSlice({
 
 export const betActions = betSlice.actions;
 
-export const getBetsFromAPI = (token: string) => {
-  return (dispatch: React.Dispatch<any>) => {
-    axios
-      .get("http://127.0.0.1:3333/bet/all-bets", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => {
-        dispatch(betActions.clearBets());
-        res.data.forEach((bet: Bet) => {
-          const newBet: Bet = {
-            id: bet.id,
-            user_id: bet.user_id,
-            game_id: bet.game_id,
-            choosen_numbers: bet.choosen_numbers,
-            price: bet.price,
-            created_at: bet.created_at,
-            type: {
-              id: bet.type.id,
-              type: bet.type.type,
-            },
-          };
-          dispatch(betActions.newBet(newBet));
-        });
-      })
-      .catch((err) => {
-        console.log(err);
+export const getBetsFromAPI = () => {
+  return async (dispatch: React.Dispatch<any>) => {
+    const { listBet } = ServiceBet();
+
+    try {
+      const res = await listBet();
+      dispatch(betActions.clearBets());
+      res.forEach((bet: Bet) => {
+        const newBet: Bet = {
+          id: bet.id,
+          user_id: bet.user_id,
+          game_id: bet.game_id,
+          choosen_numbers: bet.choosen_numbers,
+          price: bet.price,
+          created_at: bet.created_at,
+          type: {
+            id: bet.type.id,
+            type: bet.type.type,
+          },
+        };
+        dispatch(betActions.newBet(newBet));
+      });
+    } catch (error: any) {
+      if (error.errors) {
         dispatch(
           notificationActions.runNotification({
             status: "error",
-            message: err.errors[0].message,
+            message: error.errors[0].message,
           })
         );
-      });
+      } else {
+        dispatch(
+          notificationActions.runNotification({
+            status: "error",
+            message: "An unexpected error occurred. Please try again.",
+          })
+        );
+      }
+    }
   };
 };

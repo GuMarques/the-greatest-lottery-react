@@ -1,8 +1,7 @@
-import { createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
 import React from "react";
-import instance from "@services/axios.config";
+import { createSlice } from "@reduxjs/toolkit";
 import { notificationActions } from "./notification-slice";
+import { Auth, User } from "@services/index";
 
 const initialLoginState = {
   name: "",
@@ -23,19 +22,13 @@ export const userSlice = createSlice({
     login(state, action) {
       state.email = action.payload.email;
       state.name = action.payload.name;
-      state.token = action.payload.token;
+      localStorage.setItem('token', action.payload.token.token);
+      localStorage.setItem('token_expires_at', action.payload.token.expires_at);
     },
     logout(state) {
       state.name = "";
       state.email = "";
-      state.token = {
-        type: "",
-        token: "",
-        expires_at: "",
-      };
-    },
-    loginFailed(state) {
-      state.email = "";
+      localStorage.clear();
     },
     resetPasswordSetToken(state, action) {
       state.resetPasswordToken = action.payload;
@@ -49,29 +42,27 @@ export const userSlice = createSlice({
 export const userActions = userSlice.actions;
 
 export const sendLoginRequest = (email: string, password: string) => {
-  return (dispatch: React.Dispatch<any>) => {
-    axios
-      .post("http://127.0.0.1:3333/login", {
-        email,
-        password,
-      })
-      .then((res) => {
-        dispatch(
-          userActions.login({
-            email: email,
-            name: res.data.user.name,
-            token: res.data.token,
-          })
-        );
-      })
-      .catch((error) => {
+  return async (dispatch: React.Dispatch<any>) => {
+    const { login } = Auth();
+    try {
+      const res = await login({ email, password });
+      dispatch(
+        userActions.login({
+          email: email,
+          name: res.user.name,
+          token: res.token,
+        })
+      );
+    } catch (error: any) {
+      if (error.data) {
         dispatch(
           notificationActions.runNotification({
             status: "error",
-            message: error.response.data.message,
+            message: error.data.message,
           })
         );
-      });
+      }
+    }
   };
 };
 
@@ -80,48 +71,68 @@ export const sendSignUpRequest = (
   email: string,
   password: string
 ) => {
-  return (dispatch: React.Dispatch<any>) => {
-    instance
-      .post("/user/create", {
-        name,
-        email,
-        password,
-      })
-      .then((res) => {
+  return async (dispatch: React.Dispatch<any>) => {
+    const { createUser } = User();
+
+    try {
+      const res = await createUser(email, password, name);
+      dispatch(
+        notificationActions.runNotification({
+          status: "sucess",
+          message: "Your account has been sucessfully created!",
+        })
+      );
+      dispatch(
+        userActions.login({
+          email,
+          name,
+          token: res.token,
+        })
+      );
+    } catch (error: any) {
+      if (error.data) {
         dispatch(
           notificationActions.runNotification({
-            status: "sucess",
-            message: "Your account has been sucessfully created!",
+            status: "error",
+            message: error.data.message,
           })
         );
+      } else {
         dispatch(
-          userActions.login({
-            email,
-            name,
-            token: res.data.token,
+          notificationActions.runNotification({
+            status: "error",
+            message: "An unexpected error occurred. Please try again.",
           })
         );
-      });
+      }
+    }
   };
 };
 
 export const sendResetPasswordRequest = (email: string) => {
-  return (dispatch: React.Dispatch<any>) => {
-    axios
-      .post("http://127.0.0.1:3333/reset", {
-        email,
-      })
-      .then((res) => {
-        dispatch(userActions.resetPasswordSetToken(res.data.token));
-      })
-      .catch((err) => {
+  return async (dispatch: React.Dispatch<any>) => {
+    const { resetPassword } = Auth();
+    try {
+      const res = await resetPassword(email);
+      console.log(res);
+      dispatch(userActions.resetPasswordSetToken(res.token));
+    } catch (error: any) {
+      if (error.data) {
         dispatch(
           notificationActions.runNotification({
             status: "error",
-            message: err.response.data.errors[0].message,
+            message: error.data.errors[0].message,
           })
         );
-      });
+      } else {
+        dispatch(
+          notificationActions.runNotification({
+            status: "error",
+            message: "An unexpected error occurred. Please try again.",
+          })
+        );
+      }
+    }
   };
 };
 
@@ -129,30 +140,27 @@ export const sendChangePasswordRequest = (
   token: string,
   newPassword: string
 ) => {
-  return (dispatch: React.Dispatch<any>) => {
-    axios
-      .post("http://127.0.0.1:3333/reset/" + token, {
-        password: newPassword,
-      })
-      .then(() => {
-        dispatch(
-          notificationActions.runNotification({
-            status: "sucess",
-            message: "Password updated successfully!",
-          })
-        );
-        dispatch(userActions.resetPasswordSetToken(""));
-        dispatch(userActions.navigateAfterResetPassword("/login"));
-      })
-      .catch(() => {
-        dispatch(
-          notificationActions.runNotification({
-            status: "error",
-            message: "Fail to update password. Please try again. ",
-          })
-        );
-        dispatch(userActions.resetPasswordSetToken(""));
-        dispatch(userActions.navigateAfterResetPassword("/reset-password"));
-      });
+  return async (dispatch: React.Dispatch<any>) => {
+    const { changePassword } = Auth();
+    try {
+      changePassword(token, newPassword);
+      dispatch(
+        notificationActions.runNotification({
+          status: "sucess",
+          message: "Password updated successfully!",
+        })
+      );
+      dispatch(userActions.resetPasswordSetToken(""));
+      dispatch(userActions.navigateAfterResetPassword("/login"));
+    } catch {
+      dispatch(
+        notificationActions.runNotification({
+          status: "error",
+          message: "Fail to update password. Please try again. ",
+        })
+      );
+      dispatch(userActions.resetPasswordSetToken(""));
+      dispatch(userActions.navigateAfterResetPassword("/reset-password"));
+    }
   };
 };

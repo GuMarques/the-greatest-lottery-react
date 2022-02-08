@@ -9,6 +9,7 @@ import {
   TrashIcon,
 } from "./styled";
 import trash from "@icons/trash.svg";
+import ConvertPrice from "@utils/convert-monetary-value";
 
 interface game {
   name: string;
@@ -50,7 +51,7 @@ const CartItem: React.FC<{ game: game; handlerRemoveCartItem: Function }> = (
             {props.game.name}
           </CartGameName>
           <CartGamePrice>
-            R$ {props.game.price.toFixed(2).replace(".", ",")}
+            R$ {ConvertPrice(props.game.price)}
           </CartGamePrice>
         </CartGameNameContainer>
       </CartInfosContainer>

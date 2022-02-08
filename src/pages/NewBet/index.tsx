@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import NavBar from "../../components/NavBar";
+import NavBar from "@components/Navbar";
 import {
   ActionButton,
   AddToCartButton,
@@ -31,12 +31,13 @@ import { addBetToCart, cartActions, sendBetToAPI } from "@slices/cart-slice";
 import CartItem from "@components/CartItem";
 import arrow from "@icons/arrow.svg";
 import { GameButton } from "@global/global-styles";
+import Swal from "sweetalert2";
+import ConvertPrice from "@utils/convert-monetary-value";
 
 const NewBet = () => {
   const [selectedGame, setSelectedGame] = useState<game | null>(null);
   const [boardButtons, setBoardButtons] = useState<JSX.Element[] | null>(null);
   const firstBtnRef = useRef<HTMLButtonElement>(null);
-  const token = useAppSelector((state) => state.user.token);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const games: game[] = useAppSelector((state) => state.games.games).map(
@@ -47,9 +48,11 @@ const NewBet = () => {
   const numbers = useAppSelector((state) => state.numbers);
 
   useEffect(() => {
-    if (token.expires_at !== "") {
-      const expireAt = new Date(token.expires_at).getTime();
-      var isExpired = expireAt - new Date().getTime() < 0;
+    const token_expires_at = localStorage.getItem("token_expires_at");
+
+    if (token_expires_at) {
+      const expireAt = new Date(token_expires_at).getTime();
+      const isExpired = expireAt - new Date().getTime() <= 0;
       if (isExpired) {
         dispatch(userActions.logout());
         navigate("/login");
@@ -59,11 +62,11 @@ const NewBet = () => {
     } else {
       navigate("/login");
     }
-  }, [token, dispatch, navigate]);
+  }, [dispatch, navigate]);
 
   useEffect(() => {
     firstBtnRef.current?.click();
-  }, []);
+  }, [dispatch, navigate]);
 
   const buildGameButton: React.FC<game> = (game, index) => {
     if (index === 0) {
@@ -101,25 +104,29 @@ const NewBet = () => {
     }
   };
 
-  const handlerBoardButtonClick = useCallback((number: number) => {
-    const button = document.querySelector("#boardButton-" + number);
-    if (numbers.indexOf(number) === -1) {
-      if (numbers.length === selectedGame?.max_number) {
-        dispatch(
-          notificationActions.runNotification({
-            status: "error",
-            message: "You have already selected the maximum numbers for this game.",
-          })
-        );
+  const handlerBoardButtonClick = useCallback(
+    (number: number) => {
+      const button = document.querySelector("#boardButton-" + number);
+      if (numbers.indexOf(number) === -1) {
+        if (numbers.length === selectedGame?.max_number) {
+          dispatch(
+            notificationActions.runNotification({
+              status: "error",
+              message:
+                "You have already selected the maximum numbers for this game.",
+            })
+          );
+        } else {
+          button?.classList.toggle("selected");
+          dispatch(numberAction.addNumber(number));
+        }
       } else {
         button?.classList.toggle("selected");
-        dispatch(numberAction.addNumber(number));
+        dispatch(numberAction.removeNumber(number));
       }
-    } else {
-      button?.classList.toggle("selected");
-      dispatch(numberAction.removeNumber(number));
-    }
-  }, [numbers, dispatch, selectedGame]);
+    },
+    [numbers, dispatch, selectedGame]
+  );
 
   useEffect(() => {
     let tempButtons: JSX.Element[] = [];
@@ -195,12 +202,26 @@ const NewBet = () => {
     game_id: number;
     numbers: number[];
   }) => {
-    const index = cart.games.indexOf(game);
-    dispatch(cartActions.removeItem({ index: index, price: game.price }));
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, remove it!",
+      cancelButtonText: "No, cancel!",
+      reverseButtons: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const index = cart.games.indexOf(game);
+        dispatch(cartActions.removeItem({ index: index, price: game.price }));
+        Swal.fire("Deleted!", "This bet was removed from your cart", "success");
+      }
+    });
   };
 
   const handlerSaveClick = () => {
-    dispatch(sendBetToAPI(token.token, cart));
+    dispatch(sendBetToAPI(cart));
+    navigate("/");
   };
 
   return (
@@ -219,11 +240,11 @@ const NewBet = () => {
           <GameDescriptionText>{selectedGame?.description}</GameDescriptionText>
           <div>{boardButtons?.map((button) => button)}</div>
           <ActionButtonsContainer>
-            <ActionButton onClick={handlerClearButtonClick}>
-              Clear Game
-            </ActionButton>
             <ActionButton onClick={handlerCompleteBetClick}>
               Complete Bet
+            </ActionButton>
+            <ActionButton onClick={handlerClearButtonClick}>
+              Clear Game
             </ActionButton>
             <AddToCartButton onClick={handlerAddToCartClick}>
               Add to Cart
@@ -248,9 +269,7 @@ const NewBet = () => {
               </EmptyCartText>
             ) : null}
           </CartItensContainer>
-          <CartTotal>
-            CART TOTAL: R$ {cart.total.toFixed(2).replace(".", ",")}
-          </CartTotal>
+          <CartTotal>CART TOTAL: R$ {ConvertPrice(cart.total)}</CartTotal>
           <SaveButton onClick={handlerSaveClick}>
             Save <CustomSaveArrow src={arrow} />
           </SaveButton>

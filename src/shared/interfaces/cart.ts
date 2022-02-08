@@ -1,4 +1,4 @@
-export default interface Cart {
+export default interface ICart {
   games: {
     name: string;
     price: number;

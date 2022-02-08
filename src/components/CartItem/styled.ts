@@ -101,6 +101,7 @@ export const TrashIcon = styled.img`
   margin-bottom: auto;
   margin-left: 17px;
   margin-right: 14.4px;
+  cursor: pointer;
 `;
 
 export const CartTotal = styled.p`

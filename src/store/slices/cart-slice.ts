@@ -1,8 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
 import React from "react";
 import Cart from "@interfaces/cart";
 import { notificationActions } from "./notification-slice";
+import { Bet } from "@services/index";
+import INewBetRequest from "@interfaces/requests/newBetRequest";
 
 const initialCartState: Cart = { games: [], total: 0 };
 
@@ -15,7 +16,7 @@ export const cartSlice = createSlice({
       state.total += action.payload.price;
     },
     removeItem(state, action) {
-      state.total-=action.payload.price;
+      state.total -= action.payload.price;
       state.games.splice(action.payload.index, 1);
     },
     clearCart(_) {
@@ -29,7 +30,7 @@ export const addBetToCart = (
   game: {
     name: string;
     price: number;
-    color: string,
+    color: string;
     game_id: number;
     numbers: number[];
   }
@@ -47,50 +48,58 @@ export const addBetToCart = (
         }
       }
     });
-    if(response) {
-      dispatch(notificationActions.runNotification({
-        status: 'error',
-        message: 'You already placed a bet with these numbers.'
-      }))
+    if (response) {
+      dispatch(
+        notificationActions.runNotification({
+          status: "error",
+          message: "You already placed a bet with these numbers.",
+        })
+      );
     } else {
       dispatch(cartActions.addItem(game));
-      
     }
   };
 };
 
-export const sendBetToAPI = (token: string, cart: Cart) => {
-  return (dispatch: React.Dispatch<any>) => {
-    const request = {
-      games: cart.games.map((item) => {
-        return {
-          game_id: item.game_id,
-          numbers: item.numbers,
-        };
-      }),
-    };
-    axios
-      .post("http://127.0.0.1:3333/bet/new-bet", request, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => {
-        dispatch(cartActions.clearCart());
-        dispatch(
-          notificationActions.runNotification({
-            status: "sucess",
-            message: "Bet successfully placed. Good Luck!",
-          })
-        );
-      })
-      .catch((err) => {
-        console.log(err.response);
+export const sendBetToAPI = (cart: Cart) => {
+  return async (dispatch: React.Dispatch<any>) => {
+    const { newBet } = Bet();
+
+    try {
+      const request: INewBetRequest = {
+        games: cart.games.map((item) => {
+          return {
+            game_id: item.game_id,
+            numbers: item.numbers,
+          };
+        }),
+      };
+
+      await newBet(request);
+      dispatch(cartActions.clearCart());
+      dispatch(
+        notificationActions.runNotification({
+          status: "sucess",
+          message: "Bet successfully placed. Good Luck!",
+        })
+      );
+    } catch (error: any) {
+      if (error.data) {
         dispatch(
           notificationActions.runNotification({
             status: "error",
-            message: err.response.data.message,
+            message: error.data.message,
           })
         );
-      });
+      } else {
+        dispatch(
+          notificationActions.runNotification({
+            status: "error",
+            message: "An unexpected error occurred. Please try again.",
+          })
+        );
+      }
+    }
   };
 };
 

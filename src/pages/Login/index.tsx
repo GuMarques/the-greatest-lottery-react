@@ -13,22 +13,35 @@ import {
 } from "@global/global-styles";
 import Title from "@components/Title";
 import arrow from "@icons/arrow.svg";
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { sendLoginRequest, userActions } from "@slices/user-slice";
 import { useAppSelector } from "@hooks/custom-useSelector";
 import { useNavigate } from "react-router-dom";
 import { notificationActions } from "@slices/notification-slice";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+let schema = yup.object().shape({
+  email: yup.string().email().required(),
+  password: yup.string().min(6).max(16).required(),
+});
+
 const Login: React.FC = () => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
   const dispatch = useDispatch();
-  const token = useAppSelector(({ user }) => user.token);
   const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({ resolver: yupResolver(schema) });
 
   useEffect(() => {
-    if (token.expires_at !== "") {
-      const expireAt = new Date(token.expires_at).getTime();
+    const token_expires_at = localStorage.getItem('token_expires_at');
+
+    if (token_expires_at) {
+      const expireAt = new Date(token_expires_at).getTime();
       const isExpired = expireAt - new Date().getTime() <= 0;
       if (isExpired) {
         dispatch(userActions.logout());
@@ -36,22 +49,28 @@ const Login: React.FC = () => {
         navigate("/");
       }
     }
-  }, [token, dispatch, navigate]);
+  }, []);
 
-  const loginHandler = (event: React.FormEvent) => {
-    event.preventDefault();
-    const emailValidate = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,})+$/i;
-    if (!email.match(emailValidate)) {
+  useEffect(() => {
+    if (errors.email?.message)
       dispatch(
         notificationActions.runNotification({
           status: "error",
-          message: "This is not a valid email adress.",
+          message: errors.email?.message,
         })
       );
-    } else {
-      dispatch(sendLoginRequest(email, password));
-    }
-  };
+    else if (errors.password?.message)
+      dispatch(
+        notificationActions.runNotification({
+          status: "error",
+          message: errors.password?.message,
+        })
+      );
+  }, [errors]);
+
+  const loginHandler = handleSubmit((data) =>
+    dispatch(sendLoginRequest(data.email, data.password))
+  );
 
   const registrationRedirect = () => {
     navigate("/registration");
@@ -64,19 +83,17 @@ const Login: React.FC = () => {
         <AuthText>Authentication</AuthText>
         <CustomForm onSubmit={loginHandler}>
           <CustomInput
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            type="email"
+            id="email"
+            type="text"
             placeholder="Email"
-            required
+            {...register("email")}
           />
           <CustomHr />
           <CustomInput
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            id="password"
             type="password"
             placeholder="Password"
-            required
+            {...register("password")}
           />
           <CustomHr />
           <ForgetPasswordLink to="/reset-password">

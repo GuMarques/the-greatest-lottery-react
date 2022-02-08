@@ -18,11 +18,32 @@ import { useAppSelector } from "@hooks/custom-useSelector";
 import { notificationActions } from "@slices/notification-slice";
 import { sendResetPasswordRequest } from "@slices/user-slice";
 import arrow from "@icons/arrow.svg";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+let schema = yup.object().shape({
+  email: yup.string().email().required(),
+});
 
 const ResetPassword = () => {
-  const [email, setEmail] = useState<string>("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({ resolver: yupResolver(schema) });
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (errors.email?.message)
+      dispatch(
+        notificationActions.runNotification({
+          status: "error",
+          message: errors.email?.message,
+        })
+      );
+  }, [errors]);
 
   const resetPasswordToken = useAppSelector(
     (state) => state.user.resetPasswordToken
@@ -34,20 +55,9 @@ const ResetPassword = () => {
     }
   }, [resetPasswordToken, navigate]);
 
-  const sendLinkHandler = (event: React.FormEvent) => {
-    event.preventDefault();
-    const emailValidate = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,})+$/i;
-    if (!email.match(emailValidate)) {
-      dispatch(
-        notificationActions.runNotification({
-          status: "error",
-          message: "This is not a valid email adress.",
-        })
-      );
-    } else {
-      dispatch(sendResetPasswordRequest(email));
-    }
-  };
+  const sendLinkHandler = handleSubmit((data) =>
+    dispatch(sendResetPasswordRequest(data.email))
+  );
 
   const backButtonHandler = () => {
     navigate(-1);
@@ -59,17 +69,18 @@ const ResetPassword = () => {
         <AuthText>Reset password</AuthText>
         <CustomForm onSubmit={sendLinkHandler}>
           <CustomInput
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            id="email"
             type="email"
             placeholder="Email"
-            required
+            {...register("email")}
           />
           <CustomHr />
-          <CustomConfirmButton type="submit">Confirm Email <CustomGreenArrow src={arrow} /></CustomConfirmButton>
+          <CustomConfirmButton type="submit">
+            Confirm Email <CustomGreenArrow src={arrow} />
+          </CustomConfirmButton>
         </CustomForm>
         <CustomBackButton onClick={backButtonHandler}>
-        <CustomInvertedGrayArrow src={arrow} /> Back
+          <CustomInvertedGrayArrow src={arrow} /> Back
         </CustomBackButton>
       </Container>
     </Background>

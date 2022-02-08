@@ -29,6 +29,7 @@ export const MiddleTitle = styled.h2`
   margin: 0;
   margin-top: 30px;
   margin-bottom: 20px;
+  line-height: 39px;
 `;
 
 export const EndTitle = styled.h1`

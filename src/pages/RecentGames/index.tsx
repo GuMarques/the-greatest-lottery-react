@@ -3,7 +3,7 @@ import { userActions } from "../../store/slices/user-slice";
 import { useAppSelector } from "../../shared/hooks/custom-useSelector";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import NavBar from "../../components/NavBar";
+import NavBar from "../../components/Navbar";
 
 import {
   Container,
@@ -25,33 +25,35 @@ import { getGamesFromAPI } from "@slices/games-slice";
 import game from "@interfaces/game";
 import arrow from "@icons/arrow.svg";
 import { AuthText, GameButton } from "@global/global-styles";
+import ConvertPrice from "@utils/convert-monetary-value";
 
 const RecentGames: React.FC = () => {
   const [filteredId, setFilteredId] = useState<number | null>(null);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const token = useAppSelector((state) => state.user.token);
   const bets = useAppSelector((state) => state.bets);
   const games: game[] = useAppSelector((state) => state.games.games).map(
     (game) => JSON.parse(game)
   );
 
   useEffect(() => {
-    if (token.expires_at !== "") {
-      const expireAt = new Date(token.expires_at).getTime();
-      var isExpired = expireAt - new Date().getTime() < 0;
+    const token_expires_at = localStorage.getItem("token_expires_at");
+
+    if (token_expires_at) {
+      const expireAt = new Date(token_expires_at).getTime();
+      const isExpired = expireAt - new Date().getTime() <= 0;
       if (isExpired) {
         dispatch(userActions.logout());
         navigate("/login");
       } else {
-        dispatch(getBetsFromAPI(token.token));
+        dispatch(getBetsFromAPI());
         dispatch(getGamesFromAPI());
       }
     } else {
       navigate("/login");
     }
-  }, [token, dispatch, navigate]);
+  }, [dispatch, navigate]);
 
   const formatDate = (data: Date): string => {
     const dd = data.getDate();
@@ -99,7 +101,7 @@ const RecentGames: React.FC = () => {
           <InfosContainer>
             <GameNumbers>{bet.choosen_numbers.replace(/,/g, ", ")}</GameNumbers>
             <GameInfos>
-              {date} - (R$ {bet.price.toFixed(2)})
+              {date} - (R$ {ConvertPrice(bet.price)})
             </GameInfos>
             <GameName bgColor={game?.color}>{bet.type.type}</GameName>
           </InfosContainer>
@@ -124,9 +126,9 @@ const RecentGames: React.FC = () => {
         {bets.map((bet) => {
           return buildRecentGame(JSON.parse(bet));
         })}
-        {
-          bets.length === 0 ? <AuthText>You don't have any games yet, make a bet!</AuthText> : null
-        }
+        {bets.length === 0 ? (
+          <AuthText>You don't have any games yet, make a bet!</AuthText>
+        ) : null}
       </Container>
     </>
   );

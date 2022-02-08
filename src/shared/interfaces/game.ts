@@ -1,4 +1,4 @@
-export default interface game {
+export default interface IGame {
   id: number,
   type: string,
   description: string,
