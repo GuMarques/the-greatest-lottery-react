@@ -16,11 +16,12 @@ import {
 import Title from "@components/Title";
 import { useAppSelector } from "@hooks/custom-useSelector";
 import { notificationActions } from "@slices/notification-slice";
-import { sendResetPasswordRequest } from "@slices/user-slice";
+import { sendResetPasswordRequest, userActions } from "@slices/user-slice";
 import arrow from "@icons/arrow.svg";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import checkToken from "@utils/checkToken";
 
 let schema = yup.object().shape({
   email: yup.string().email().required(),
@@ -59,6 +60,12 @@ const ResetPassword = () => {
     dispatch(sendResetPasswordRequest(data.email))
   );
 
+  if(checkToken()){
+    navigate("/");
+  } else {
+    dispatch(userActions.logout());
+  }
+
   const backButtonHandler = () => {
     navigate(-1);
   };
@@ -70,16 +77,16 @@ const ResetPassword = () => {
         <CustomForm onSubmit={sendLinkHandler}>
           <CustomInput
             id="email"
-            type="email"
+            type="text"
             placeholder="Email"
             {...register("email")}
           />
           <CustomHr />
-          <CustomConfirmButton type="submit">
+          <CustomConfirmButton id="confirmEmail" type="submit">
             Confirm Email <CustomGreenArrow src={arrow} />
           </CustomConfirmButton>
         </CustomForm>
-        <CustomBackButton onClick={backButtonHandler}>
+        <CustomBackButton id="back" onClick={backButtonHandler}>
           <CustomInvertedGrayArrow src={arrow} /> Back
         </CustomBackButton>
       </Container>

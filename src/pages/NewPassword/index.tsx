@@ -21,6 +21,7 @@ import arrow from "@icons/arrow.svg";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import checkToken from "@utils/checkToken";
 
 let schema = yup.object().shape({
   password: yup.string().min(6).max(16).required(),
@@ -40,6 +41,12 @@ const NewPassword = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  if(checkToken()){
+    navigate("/");
+  } else {
+    dispatch(userActions.logout());
+  }
 
   useEffect(() => {
     if (errors.password?.message)
@@ -101,11 +108,11 @@ const NewPassword = () => {
             {...register("confirmPassword")}
           />
           <CustomHr />
-          <CustomConfirmButton type="submit">
+          <CustomConfirmButton id="changePassword" type="submit">
             Change Password <CustomGreenArrow src={arrow} />
           </CustomConfirmButton>
         </CustomForm>
-        <CustomBackButton onClick={backButtonHandler}>
+        <CustomBackButton id="back" onClick={backButtonHandler}>
           <CustomInvertedGrayArrow src={arrow} /> Back
         </CustomBackButton>
       </Container>

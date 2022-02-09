@@ -23,12 +23,12 @@ export const betSlice = createSlice({
 
 export const betActions = betSlice.actions;
 
-export const getBetsFromAPI = () => {
+export const getBetsFromAPI = (gameTypes: string[]) => {
   return async (dispatch: React.Dispatch<any>) => {
     const { listBet } = ServiceBet();
 
     try {
-      const res = await listBet();
+      const res = await listBet(gameTypes);
       dispatch(betActions.clearBets());
       res.forEach((bet: Bet) => {
         const newBet: Bet = {
@@ -51,13 +51,6 @@ export const getBetsFromAPI = () => {
           notificationActions.runNotification({
             status: "error",
             message: error.errors[0].message,
-          })
-        );
-      } else {
-        dispatch(
-          notificationActions.runNotification({
-            status: "error",
-            message: "An unexpected error occurred. Please try again.",
           })
         );
       }

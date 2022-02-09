@@ -10,25 +10,21 @@ import {
   HeaderContainer,
   Title,
   FiltersText,
-  GameContainer,
-  InfosContainer,
-  GameBar,
-  GameNumbers,
-  GameInfos,
-  GameName,
   NewBetLink,
   CustomNewBetArrow,
+  GamesButtonContainer,
 } from "./styles";
 import { getBetsFromAPI } from "@slices/bets-slice";
-import bet from "@interfaces/bet";
 import { getGamesFromAPI } from "@slices/games-slice";
 import game from "@interfaces/game";
 import arrow from "@icons/arrow.svg";
-import { AuthText, GameButton } from "@global/global-styles";
-import ConvertPrice from "@utils/convert-monetary-value";
+import { AuthText } from "@global/global-styles";
+import GameButton from "@components/GameButton";
+import RecentGame from "@components/RecentGame";
+import checkToken from "@utils/checkToken";
 
 const RecentGames: React.FC = () => {
-  const [filteredId, setFilteredId] = useState<number | null>(null);
+  const [filteredType, setFilteredType] = useState<string[]>([]);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -37,78 +33,34 @@ const RecentGames: React.FC = () => {
     (game) => JSON.parse(game)
   );
 
+  if (!checkToken()) {
+    dispatch(userActions.logout());
+    navigate("/login");
+  }
+
   useEffect(() => {
-    const token_expires_at = localStorage.getItem("token_expires_at");
+    dispatch(getGamesFromAPI());
+  }, []);
 
-    if (token_expires_at) {
-      const expireAt = new Date(token_expires_at).getTime();
-      const isExpired = expireAt - new Date().getTime() <= 0;
-      if (isExpired) {
-        dispatch(userActions.logout());
-        navigate("/login");
+  useEffect(() => {
+    dispatch(getBetsFromAPI(filteredType));
+  }, [filteredType]);
+
+  const handleFilter = (game: game) => {
+    const gameType = game.type;
+    setFilteredType((prevState) => {
+      let tempArray;
+      if (prevState.includes(gameType)) {
+        tempArray = prevState.filter((value) => {
+          return value !== gameType;
+        });
       } else {
-        dispatch(getBetsFromAPI());
-        dispatch(getGamesFromAPI());
+        tempArray = prevState.concat(gameType);
       }
-    } else {
-      navigate("/login");
-    }
-  }, [dispatch, navigate]);
-
-  const formatDate = (data: Date): string => {
-    const dd = data.getDate();
-    const mm = data.getMonth() + 1;
-    const yyyy = data.getFullYear();
-    let formatedDate: string;
-    if (dd < 10) {
-      formatedDate = "0" + dd;
-    } else {
-      formatedDate = "" + dd;
-    }
-    if (mm < 10) {
-      formatedDate += "/0" + mm;
-    } else {
-      formatedDate += "/" + mm;
-    }
-    return formatedDate + "/" + yyyy;
+      return tempArray;
+    });
   };
 
-  const buildGameButton: React.FC<game> = (game) => {
-    return (
-      <GameButton
-        className={filteredId === game.id ? "active" : undefined}
-        type="button"
-        bgColor={game.color}
-        key={game.id}
-        onClick={() => handleFilter(game.id)}
-      >
-        {game.type}
-      </GameButton>
-    );
-  };
-
-  const handleFilter = (gameId: number) => {
-    setFilteredId((prevState) => (prevState === gameId ? null : gameId));
-  };
-
-  const buildRecentGame: React.FC<bet> = (bet) => {
-    if (filteredId === null || filteredId === bet.game_id) {
-      const date = formatDate(new Date(bet.created_at));
-      const game = games.find((game) => game.id === bet.game_id);
-      return (
-        <GameContainer key={bet.id + "-" + bet.user_id}>
-          <GameBar bgColor={game?.color} />
-          <InfosContainer>
-            <GameNumbers>{bet.choosen_numbers.replace(/,/g, ", ")}</GameNumbers>
-            <GameInfos>
-              {date} - (R$ {ConvertPrice(bet.price)})
-            </GameInfos>
-            <GameName bgColor={game?.color}>{bet.type.type}</GameName>
-          </InfosContainer>
-        </GameContainer>
-      );
-    } else return null;
-  };
   return (
     <>
       <NavBar />
@@ -116,18 +68,37 @@ const RecentGames: React.FC = () => {
         <HeaderContainer>
           <Title>RECENT GAMES</Title>
           <FiltersText>Filters</FiltersText>
-          {games.map((game) => {
-            return buildGameButton(game);
-          })}
+          <GamesButtonContainer>
+            {games.map((game) => {
+              return (
+                <GameButton
+                  key={game.id}
+                  game={game}
+                  handleClick={() => handleFilter(game)}
+                  active={filteredType.indexOf(game.type) !== -1}
+                />
+              );
+            })}
+          </GamesButtonContainer>
           <NewBetLink to="/new-bet">
             New Bet <CustomNewBetArrow src={arrow} />
           </NewBetLink>
         </HeaderContainer>
-        {bets.map((bet) => {
-          return buildRecentGame(JSON.parse(bet));
-        })}
+        <div id="recent-games">
+          {bets.map((bet) => {
+            const parsedBet = JSON.parse(bet);
+            return (
+              <RecentGame
+                bet={parsedBet}
+                key={parsedBet.id + "-" + parsedBet.user_id}
+              />
+            );
+          })}
+        </div>
         {bets.length === 0 ? (
-          <AuthText>You don't have any games yet, make a bet!</AuthText>
+          <AuthText>
+            You don't have any games in this cofiguration, make a bet!
+          </AuthText>
         ) : null}
       </Container>
     </>

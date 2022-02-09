@@ -6,13 +6,9 @@ import { Auth, User } from "@services/index";
 const initialLoginState = {
   name: "",
   email: "",
-  token: {
-    type: "",
-    token: "",
-    expires_at: "",
-  },
   resetPasswordToken: "",
   navigateTo: "",
+  loggedIn: false,
 };
 
 export const userSlice = createSlice({
@@ -22,19 +18,25 @@ export const userSlice = createSlice({
     login(state, action) {
       state.email = action.payload.email;
       state.name = action.payload.name;
-      localStorage.setItem('token', action.payload.token.token);
-      localStorage.setItem('token_expires_at', action.payload.token.expires_at);
+      state.loggedIn = true;
+      localStorage.setItem("token", action.payload.token.token);
+      localStorage.setItem("token_expires_at", action.payload.token.expires_at);
     },
     logout(state) {
-      state.name = "";
-      state.email = "";
       localStorage.clear();
+      state.name = "",
+      state.email = "",
+      state.loggedIn = false
     },
     resetPasswordSetToken(state, action) {
       state.resetPasswordToken = action.payload;
     },
     navigateAfterResetPassword(state, action) {
       state.navigateTo = action.payload;
+    },
+    relogin(state, action) {
+      state.email = action.payload.email;
+      state.name = action.payload.name;
     },
   },
 });
@@ -114,14 +116,13 @@ export const sendResetPasswordRequest = (email: string) => {
     const { resetPassword } = Auth();
     try {
       const res = await resetPassword(email);
-      console.log(res);
       dispatch(userActions.resetPasswordSetToken(res.token));
     } catch (error: any) {
       if (error.data) {
         dispatch(
           notificationActions.runNotification({
             status: "error",
-            message: error.data.errors[0].message,
+            message: error.data.message,
           })
         );
       } else {
@@ -161,6 +162,64 @@ export const sendChangePasswordRequest = (
       );
       dispatch(userActions.resetPasswordSetToken(""));
       dispatch(userActions.navigateAfterResetPassword("/reset-password"));
+    }
+  };
+};
+
+export const getAccount = () => {
+  return async (dispatch: React.Dispatch<any>) => {
+    const { myAccount } = User();
+    try {
+      const res = await myAccount();
+      dispatch(userActions.relogin({ email: res.email, name: res.name }));
+    } catch (error: any) {
+      if (error.data) {
+        dispatch(
+          notificationActions.runNotification({
+            status: "error",
+            message: error.data.message,
+          })
+        );
+      } else {
+        dispatch(
+          notificationActions.runNotification({
+            status: "error",
+            message: "An unexpected error occurred. Please try again.",
+          })
+        );
+      }
+    }
+  };
+};
+
+export const updateAccount = (email: string, name: string) => {
+  return async (dispatch: React.Dispatch<any>) => {
+    const { updateMyUser } = User();
+    try {
+      const res = await updateMyUser(email, name);
+      dispatch(userActions.relogin({ email: res.email, name: res.name }));
+      dispatch(
+        notificationActions.runNotification({
+          status: "sucess",
+          message: "Infos updated succesfully",
+        })
+      );
+    } catch (error: any) {
+      if (error.data) {
+        dispatch(
+          notificationActions.runNotification({
+            status: "error",
+            message: error.data.message,
+          })
+        );
+      } else {
+        dispatch(
+          notificationActions.runNotification({
+            status: "error",
+            message: "An unexpected error occurred. Please try again.",
+          })
+        );
+      }
     }
   };
 };

@@ -5,8 +5,8 @@ import INewBetResponse from '@interfaces/responses/newBetResponse';
 import INewBetRequest from '@interfaces/requests/newBetRequest';
 
 const Bet = (): IBet => {
-  async function listBet(): Promise<IListBetResponse[]> {
-    return instance.get("/bet/all-bets");
+  async function listBet(query: string[]): Promise<IListBetResponse[]> {
+    return instance.get("/bet/all-bets", { params: { type: query}});
   }
   async function newBet(bet: INewBetRequest): Promise<INewBetResponse> {
     return instance.post("/bet/new-bet", bet);

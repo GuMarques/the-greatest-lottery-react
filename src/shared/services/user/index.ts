@@ -16,7 +16,7 @@ const User = (): IUser => {
     email: string,
     name: string
   ): Promise<IUpdateMyUser> {
-    return instance.post("/user/update", { email, name });
+    return instance.put("/user/update", { email, name });
   }
   async function myAccount(): Promise<IMyAccountResponse> {
     return instance.get("/user/my-account");

@@ -3,19 +3,51 @@ import styled from "styled-components";
 export const ContentSection = styled.section`
   display: flex;
   flex-direction: column;
-  margin-left: 130px;
-  margin-right: 166px;
   margin-bottom: 50px;
+  /* margin-left: 130px;
+  margin-right: 166px;
+  
   @media (min-width: 1130px) {
     flex-direction: row;
     margin-left: 130px;
     margin-right: 166px;
     justify-content: space-between;
+  } */
+
+  margin-left: 40px;
+  margin-right: 0px;
+  @media (min-width: 996px) {
+    margin-left: 84px;
+    margin-right: 40px;
+  }
+  @media (min-width: 1170px) {
+    margin-left: 166px;
+    margin-right: 130px;
+    flex-direction: row;
+    justify-content: space-between;
   }
 `;
 
 export const BetBoard = styled.div`
-  margin-right: 40px;
+  margin-right: 0;
+  @media (min-width: 1170px) {
+    margin-right: 40px;
+  }
+`;
+
+export const GamesButtonContainer = styled.div`
+  display: flex;
+  margin-bottom: 8px;
+  flex-direction: column;
+  button {
+    margin-bottom: 5px;
+  }
+  @media (min-width: 450px) {
+    flex-direction: row;
+    button {
+      margin-bottom: 0;
+    }
+  }
 `;
 
 export const BetBoardTitle = styled.h1`
@@ -76,8 +108,13 @@ export const BoardButton = styled.button<GameColorType>`
 
 export const ActionButtonsContainer = styled.div`
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: start;
+  flex-direction: column;
+  @media(min-width: 450px) {
+    align-items: flex-start;
+    flex-direction: row;
+  }
 `;
 
 export const ActionButton = styled.button`
@@ -110,8 +147,13 @@ export const AddToCartButton = styled.button`
   padding-left: 25px;
   padding-right: 25px;
   margin-top: 44px;
-  margin-left: auto;
+  margin-right: 25px;
   cursor: pointer;
+
+  @media(min-width: 450px) {
+    margin-left: auto;
+    margin-right: 0;
+  }
 `;
 
 export const CartContainer = styled.div`

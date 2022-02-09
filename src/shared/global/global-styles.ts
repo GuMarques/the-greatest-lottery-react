@@ -8,6 +8,7 @@ export const Background = styled.section`
   background-color: #f7f7f7;
   margin-top: 40px;
   margin-bottom: 40px;
+  margin-left: 34px;
   @media (min-width: 860px) {
     flex-direction: row;
     margin: 0;
@@ -66,33 +67,6 @@ export const CustomInvertedGrayArrow = styled.img`
   }
 `;
 
-export const GameButton = styled.button<GameColorType>`
-  border-radius: 100px;
-  border: 2px solid
-    ${({ bgColor }: GameColorType) =>
-      bgColor !== undefined ? bgColor : "#7f3992"};
-  background-color: white;
-  width: 113px;
-  height: 34px;
-  font-size: 14px;
-  font-style: italic;
-  color: ${({ bgColor }: GameColorType) =>
-    bgColor !== undefined ? bgColor : "#7f3992"};
-  margin-right: 25px;
-  font-weight: bold;
-  :hover {
-    background-color: ${({ bgColor }: GameColorType) =>
-      bgColor !== undefined ? bgColor : "#7f3992"};
-    color: white;
-  }
-  &.active {
-    background-color: ${({ bgColor }: GameColorType) =>
-      bgColor !== undefined ? bgColor : "#7f3992"};
-    color: white;
-  }
-  cursor: pointer;
-`;
-
 /* FORM COMPONENTS */
 
 export const CustomForm = styled.form`
@@ -101,7 +75,7 @@ export const CustomForm = styled.form`
   box-shadow: 0px 3px 25px #00000014;
   border: 1px solid #dddddd;
   border-radius: 14px;
-  min-width: 352px;
+  min-width: 300px;
   padding-right: 27px;
   padding-left: 30px;
   background-color: white;
@@ -151,7 +125,3 @@ export const AuthText = styled.h2`
   font-weight: bold;
   font-style: italic;
 `;
-
-type GameColorType = {
-  bgColor?: string;
-};

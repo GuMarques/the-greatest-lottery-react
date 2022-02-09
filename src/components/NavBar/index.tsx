@@ -14,10 +14,12 @@ import { cartActions } from "../../store/slices/cart-slice";
 import { gameActions } from "../../store/slices/games-slice";
 import { numberAction } from "../../store/slices/numbers-slice";
 import { userActions } from "../../store/slices/user-slice";
+import { useNavigate } from "react-router-dom";
 
 const NavBar = () => {
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handlerLogout = () => {
     dispatch(userActions.logout());
@@ -30,13 +32,13 @@ const NavBar = () => {
   return (
     <>
       <NavBarContainer>
-        <LogoContainer>
+        <LogoContainer onClick={() => navigate('/')}>
           <Logo>TGL</Logo>
           <LogoUnderline />
         </LogoContainer>
         <NavBarLinks>
-          <NavLink to="/">Account</NavLink>
-          <ButtonLink onClick={handlerLogout}>Sair</ButtonLink>
+          <NavLink id="account" to="/account">Account</NavLink>
+          <ButtonLink id="logout" onClick={handlerLogout}>Sair</ButtonLink>
         </NavBarLinks>
       </NavBarContainer>
       <NavHr />

@@ -21,6 +21,7 @@ import { notificationActions } from "@slices/notification-slice";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import checkToken from "@utils/checkToken";
 
 let schema = yup.object().shape({
   name: yup.string().required(),
@@ -38,7 +39,6 @@ const Registration = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log(errors);
     if (errors.name?.message)
       dispatch(
         notificationActions.runNotification({
@@ -62,19 +62,11 @@ const Registration = () => {
       );
   }, [errors]);
 
-  useEffect(() => {
-    const token_expires_at = localStorage.getItem('token_expires_at');
-
-    if (token_expires_at) {
-      const expireAt = new Date(token_expires_at).getTime();
-      const isExpired = expireAt - new Date().getTime() <= 0;
-      if (isExpired) {
-        dispatch(userActions.logout());
-      } else {
-        navigate("/");
-      }
-    }
-  }, [dispatch, navigate]);
+  if(checkToken()){
+    navigate("/");
+  } else {
+    dispatch(userActions.logout());
+  }
 
   const backHandler = () => {
     navigate(-1);
@@ -111,11 +103,11 @@ const Registration = () => {
             {...register("password")}
           />
           <CustomHr />
-          <CustomConfirmButton type="submit">
+          <CustomConfirmButton id="register" type="submit">
             Register <CustomGreenArrow src={arrow} />
           </CustomConfirmButton>
         </CustomForm>
-        <CustomBackButton onClick={backHandler}>
+        <CustomBackButton id="back" onClick={backHandler}>
           <CustomInvertedGrayArrow src={arrow} /> Back
         </CustomBackButton>
       </Container>

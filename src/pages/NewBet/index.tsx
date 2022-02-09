@@ -20,6 +20,7 @@ import {
   CartItensContainer,
   EmptyCartText,
   CustomSaveArrow,
+  GamesButtonContainer,
 } from "./styled";
 import { useAppSelector } from "@hooks/custom-useSelector";
 import game from "@interfaces/game";
@@ -30,9 +31,10 @@ import { userActions } from "@slices/user-slice";
 import { addBetToCart, cartActions, sendBetToAPI } from "@slices/cart-slice";
 import CartItem from "@components/CartItem";
 import arrow from "@icons/arrow.svg";
-import { GameButton } from "@global/global-styles";
 import Swal from "sweetalert2";
 import ConvertPrice from "@utils/convert-monetary-value";
+import GameButton from "@components/GameButton";
+import checkToken from "@utils/checkToken";
 
 const NewBet = () => {
   const [selectedGame, setSelectedGame] = useState<game | null>(null);
@@ -47,52 +49,38 @@ const NewBet = () => {
 
   const numbers = useAppSelector((state) => state.numbers);
 
-  useEffect(() => {
-    const token_expires_at = localStorage.getItem("token_expires_at");
-
-    if (token_expires_at) {
-      const expireAt = new Date(token_expires_at).getTime();
-      const isExpired = expireAt - new Date().getTime() <= 0;
-      if (isExpired) {
-        dispatch(userActions.logout());
-        navigate("/login");
-      } else {
-        dispatch(getGamesFromAPI());
-      }
-    } else {
-      navigate("/login");
-    }
-  }, [dispatch, navigate]);
+  if (!checkToken()) {
+    dispatch(userActions.logout());
+    navigate("/login");
+  }
 
   useEffect(() => {
     firstBtnRef.current?.click();
+  }, [firstBtnRef.current]);
+
+  useEffect(() => {
+    dispatch(getGamesFromAPI());
   }, [dispatch, navigate]);
 
   const buildGameButton: React.FC<game> = (game, index) => {
     if (index === 0) {
       return (
         <GameButton
-          className={selectedGame?.id === game.id ? "active" : undefined}
-          type="button"
-          bgColor={game.color}
-          key={game.id}
-          onClick={() => handlerGameButtonClick(game)}
+          active={selectedGame?.id === game.id}
+          game={game}
+          handleClick={() => handlerGameButtonClick(game)}
           ref={firstBtnRef}
-        >
-          {game.type}
-        </GameButton>
+          key={game.type}
+        />
       );
     } else {
       return (
         <GameButton
-          className={selectedGame?.id === game.id ? "active" : undefined}
-          type="button"
-          bgColor={game.color}
-          key={game.id}
-          onClick={() => handlerGameButtonClick(game)}
-        >
-          {game.type}
-        </GameButton>
+          active={selectedGame?.id === game.id}
+          game={game}
+          handleClick={() => handlerGameButtonClick(game)}
+          key={game.type}
+        />
       );
     }
   };
@@ -233,20 +221,22 @@ const NewBet = () => {
             <b>NEW BET</b> FOR {selectedGame?.type}
           </BetBoardTitle>
           <BetBoardSubTitle>Choose a game</BetBoardSubTitle>
-          {games.map((game, index) => {
-            return buildGameButton(game, index);
-          })}
+          <GamesButtonContainer>
+            {games.map((game, index) => {
+              return buildGameButton(game, index);
+            })}
+          </GamesButtonContainer>
           <FillBetText>Fill your bet</FillBetText>
           <GameDescriptionText>{selectedGame?.description}</GameDescriptionText>
           <div>{boardButtons?.map((button) => button)}</div>
           <ActionButtonsContainer>
-            <ActionButton onClick={handlerCompleteBetClick}>
+            <ActionButton onClick={handlerCompleteBetClick} id="completebet">
               Complete Bet
             </ActionButton>
-            <ActionButton onClick={handlerClearButtonClick}>
+            <ActionButton onClick={handlerClearButtonClick} id="cleargame">
               Clear Game
             </ActionButton>
-            <AddToCartButton onClick={handlerAddToCartClick}>
+            <AddToCartButton onClick={handlerAddToCartClick} id="addtocart">
               Add to Cart
             </AddToCartButton>
           </ActionButtonsContainer>
@@ -270,7 +260,7 @@ const NewBet = () => {
             ) : null}
           </CartItensContainer>
           <CartTotal>CART TOTAL: R$ {ConvertPrice(cart.total)}</CartTotal>
-          <SaveButton onClick={handlerSaveClick}>
+          <SaveButton onClick={handlerSaveClick} id="save">
             Save <CustomSaveArrow src={arrow} />
           </SaveButton>
         </CartContainer>

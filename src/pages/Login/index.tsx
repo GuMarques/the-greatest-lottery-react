@@ -16,12 +16,12 @@ import arrow from "@icons/arrow.svg";
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { sendLoginRequest, userActions } from "@slices/user-slice";
-import { useAppSelector } from "@hooks/custom-useSelector";
 import { useNavigate } from "react-router-dom";
 import { notificationActions } from "@slices/notification-slice";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import checkToken from "@utils/checkToken";
 
 let schema = yup.object().shape({
   email: yup.string().email().required(),
@@ -37,19 +37,11 @@ const Login: React.FC = () => {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
 
-  useEffect(() => {
-    const token_expires_at = localStorage.getItem('token_expires_at');
-
-    if (token_expires_at) {
-      const expireAt = new Date(token_expires_at).getTime();
-      const isExpired = expireAt - new Date().getTime() <= 0;
-      if (isExpired) {
-        dispatch(userActions.logout());
-      } else {
-        navigate("/");
-      }
-    }
-  }, []);
+  if(checkToken()){
+    navigate("/");
+  } else {
+    dispatch(userActions.logout());
+  }
 
   useEffect(() => {
     if (errors.email?.message)
@@ -96,14 +88,14 @@ const Login: React.FC = () => {
             {...register("password")}
           />
           <CustomHr />
-          <ForgetPasswordLink to="/reset-password">
+          <ForgetPasswordLink id="forget-password" to="/reset-password">
             I forget my password
           </ForgetPasswordLink>
-          <CustomConfirmButton>
+          <CustomConfirmButton id="login">
             Log In <CustomGreenArrow src={arrow} />
           </CustomConfirmButton>
         </CustomForm>
-        <CustomBackButton onClick={registrationRedirect}>
+        <CustomBackButton id="signup" onClick={registrationRedirect}>
           Sign Up <CustomGrayArrow src={arrow} />
         </CustomBackButton>
       </Container>

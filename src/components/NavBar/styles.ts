@@ -5,14 +5,23 @@ export const NavBarContainer = styled.section`
   display: flex;
   justify-content: space-between;
   align-content: space-between;
-  padding-left: 130px;
-  padding-right: 166px;
   margin-top: 10px;
+  padding-left: 40px;
+  padding-right: 8px;
+  @media (min-width: 996px) {
+    padding-left: 84px;
+    padding-right: 40px;
+  }
+  @media (min-width: 1170px) {
+    padding-left: 166px;
+    padding-right: 130px;
+  }
 `;
 
 export const LogoContainer = styled.div`
   display: flex;
   flex-direction: column;
+  cursor: pointer;
 `;
 
 export const Logo = styled.h1`
